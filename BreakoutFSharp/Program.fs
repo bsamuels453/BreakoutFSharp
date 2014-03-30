@@ -12,16 +12,15 @@ let initializeWindow() =
     win.SetKeyRepeatEnabled false
     win
 
-let genStartBlocks textures =
-    let texture = getTexture textures "purple"
-    let xRange = [for x in 0..19 -> float32 x * blockWidth]
-    let yRange = [for y in 0..07 -> float32 y * blockHeight]
+let genStartBlocks (textures:(string*Texture) list) =
+    let xRange = [for x in 0..19 -> x]
+    let yRange = [for y in 0..05 -> y]
     let blockCoords = 
         [for x in xRange do
             for y in yRange ->
-                {X=x; Y=y}
+                (snd textures.[y], {X=float32 x * blockWidth; Y=float32 y * blockHeight})
         ]
-    let genBlock pos =
+    let genBlock (texture, pos) =
         let sprite = new RectangleShape(new Vector2f(blockWidth, blockHeight))
         sprite.Texture <- texture
         sprite.Position <- new Vector2f(pos.X, pos.Y)

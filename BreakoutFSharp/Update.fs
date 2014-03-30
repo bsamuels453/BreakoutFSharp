@@ -18,9 +18,9 @@ module Update =
             oldPaddlePos
         else
             if aState=Pressed then
-               restrictPaddlePos {X=oldPaddlePos.X - 0.20f; Y=oldPaddlePos.Y} 
+               restrictPaddlePos {X=oldPaddlePos.X - paddleSpeed; Y=oldPaddlePos.Y} 
             else
-               restrictPaddlePos {X=oldPaddlePos.X + 0.20f; Y=oldPaddlePos.Y} 
+               restrictPaddlePos {X=oldPaddlePos.X + paddleSpeed; Y=oldPaddlePos.Y} 
 
     let calcNewBallPos (ballState:BallState) =
         let xPos = ballState.Position.X + ballState.Velocity.X

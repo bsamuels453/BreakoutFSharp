@@ -13,8 +13,8 @@ let initializeWindow() =
     win
 
 let genStartBlocks (textures:(string*Texture) list) =
-    let xRange = [for x in 0..19 -> x]
-    let yRange = [for y in 0..05 -> y]
+    let xRange = [for x in 0..(int numBlockCols-1) -> x]
+    let yRange = [for y in 0..(int numBlockRows-1) -> y]
     let blockCoords = 
         [for x in xRange do
             for y in yRange ->
@@ -31,7 +31,7 @@ let genDefaultGameState textures =
     {
     BallState = {
                 Position={X=300.0f; Y=300.0f};
-                Velocity={X=0.12f; Y=0.12f}
+                Velocity={X=initlBallSpeed; Y=initlBallSpeed}
                 };
     PaddleState = {X=400.0f; Y=screenHeight-paddleXAxis};
     ActiveBlocks = genStartBlocks textures

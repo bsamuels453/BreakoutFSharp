@@ -39,6 +39,7 @@ TestProject3*/
 Packaged*/
 *.pdb
 *.pfx
+*.XML
 *.dll
 *.CodeAnalysisLog.xml
 *.lastcodeanalysissucceeded
@@ -46,6 +47,7 @@ Packaged*/
 *config.json
 obj*/
 bin*/
+Debug*/
 TestProject*/
 [Rr]elease*/
 _ReSharper*/

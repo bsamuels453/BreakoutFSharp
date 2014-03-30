@@ -9,10 +9,13 @@ module Draw =
     let loadTextures() =
         let listbuilder = new ListBuilder()
         listbuilder{
-            yield "blue", new Texture("bluesplotch.jpg")
-            yield "green", new Texture("greensplotch.jpg")
-            yield "purple", new Texture("purplesplotch.jpg")
             yield "red", new Texture("redsplotch.jpg")
+            yield "orange", new Texture("orangesplotch.jpg")
+            yield "yellow", new Texture("yellowsplotch.jpg")
+            yield "green", new Texture("greensplotch.jpg")
+            yield "cyan", new Texture("cyansplotch.jpg")
+            yield "blue", new Texture("bluesplotch.jpg")
+            yield "purple", new Texture("purplesplotch.jpg")
         }
 
     let getTexture textures desiredTexture =

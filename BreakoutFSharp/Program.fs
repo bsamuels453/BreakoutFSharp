@@ -5,6 +5,7 @@ open System;
 open GameTypes;
 open Draw;
 open Update;
+open System.IO;
 
 let initializeWindow() =
     let win = new RenderWindow(new VideoMode(uint32 screenWidth,uint32 screenHeight), "Breakout F#")

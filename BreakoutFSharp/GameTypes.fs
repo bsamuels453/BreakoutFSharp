@@ -13,12 +13,10 @@ module GameTypes =
     type BallState = {
         Position : Vec2
         Velocity : Vec2
-        Sprite : CircleShape
         }
     
     type PaddleState = {
         Position : Vec2
-        Sprite : RectangleShape
         }
 
     type KeyState =
@@ -31,14 +29,19 @@ module GameTypes =
     }
 
     type BlockState = {
-        Position:Vec2
-        Sprite:RectangleShape    
+        Position:Vec2   
     }
 
     type GameState = {
         BallState:BallState
         PaddleState:PaddleState
         ActiveBlocks:BlockState list
+    }
+
+    type RenderState = {
+        BallSprite : CircleShape
+        PaddleSprite : RectangleShape
+        BlockSprites: RectangleShape list
     }
 
     type ListBuilder() =

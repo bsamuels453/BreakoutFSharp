@@ -13,33 +13,20 @@ let initializeWindow() =
     win.SetKeyRepeatEnabled false
     win
 
-let genStartBlocks (textures:(string*Texture) list) =
-    let xRange = [for x in 0..(int numBlockCols-1) -> x]
-    let yRange = [for y in 0..(int numBlockRows-1) -> y]
-    let blockCoords = 
-        [for x in xRange do
-            for y in yRange ->
-                (snd textures.[y], {X=float32 x * blockWidth; Y=float32 y * blockHeight})
-        ]
-    let genBlock (texture, pos) =
-        let sprite = new RectangleShape(new Vector2f(blockWidth, blockHeight))
-        sprite.Texture <- texture
-        sprite.Position <- new Vector2f(pos.X, pos.Y)
-        {Position=pos; Sprite=sprite}
-    List.map genBlock blockCoords
+let genStartBlocks () =
+    [for x in blockXCoords do
+        for y in blockYCoords ->
+            {Position={X=x; Y=y}}
+    ]
 
 let genDefaultBallState textures =
-    let sprite = new CircleShape(ballWidth/2.0f)
-    sprite.Texture <- getTexture textures "blue"
     let position = {X=300.0f; Y=300.0f}
     let velocity = {X=initlBallSpeed; Y=initlBallSpeed}
-    {Position=position; Velocity=velocity; Sprite=sprite}
+    {Position=position; Velocity=velocity}
 
 let genDefaultPaddleState textures : PaddleState =
-    let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
-    sprite.Texture <- getTexture textures "red"
     let position = {X=400.0f; Y=screenHeight - paddleXAxis};
-    {Position=position; Sprite=sprite}
+    {Position=position}
 
 let genDefaultGameState textures =
     {
@@ -53,7 +40,8 @@ let genDefaultGameState textures =
 let main argv =
     let win = initializeWindow()
     let textures = loadTextures()
-    let mutable gameState = genDefaultGameState textures
+    let mutable gameState = genDefaultGameState()
+    let mutable renderState = genDefaultRenderState gameState textures
 
     while win.IsOpen() do
         win.DispatchEvents()
@@ -66,8 +54,8 @@ let main argv =
         let (newBallState, newActiveBlocks) = ballTick gameState.PaddleState.Position gameState.ActiveBlocks gameState.BallState
         gameState <- {gameState with BallState = newBallState; ActiveBlocks = newActiveBlocks}
 
-        gameState <- updateGraphics gameState
-        draw win textures gameState
+        renderState <- updateRenderState renderState gameState
+        draw win renderState
         
         ()
     0

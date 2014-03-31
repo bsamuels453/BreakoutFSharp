@@ -14,3 +14,6 @@ module GameConsts =
     let blockWidth = screenWidth/numBlockCols
     let paddleSpeed = 0.20f
     let initlBallSpeed = 0.12f
+
+    let blockXCoords = [for x in 0..(int numBlockCols-1) -> float32 x * blockWidth]
+    let blockYCoords = [for y in 0..(int numBlockRows-1) -> float32 y * blockHeight]

@@ -28,13 +28,23 @@ let genStartBlocks (textures:(string*Texture) list) =
         {Position=pos; Sprite=sprite}
     List.map genBlock blockCoords
 
+let genDefaultBallState textures =
+    let sprite = new CircleShape(ballWidth/2.0f)
+    sprite.Texture <- getTexture textures "blue"
+    let position = {X=300.0f; Y=300.0f}
+    let velocity = {X=initlBallSpeed; Y=initlBallSpeed}
+    {Position=position; Velocity=velocity; Sprite=sprite}
+
+let genDefaultPaddleState textures : PaddleState =
+    let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
+    sprite.Texture <- getTexture textures "red"
+    let position = {X=400.0f; Y=screenHeight - paddleXAxis};
+    {Position=position; Sprite=sprite}
+
 let genDefaultGameState textures =
     {
-    BallState = {
-                Position={X=300.0f; Y=300.0f};
-                Velocity={X=initlBallSpeed; Y=initlBallSpeed}
-                };
-    PaddleState = {X=400.0f; Y=screenHeight-paddleXAxis};
+    BallState = genDefaultBallState textures
+    PaddleState = genDefaultPaddleState textures
     ActiveBlocks = genStartBlocks textures
     }
 
@@ -48,10 +58,15 @@ let main argv =
     while win.IsOpen() do
         win.DispatchEvents()
         let keyboardState = pollKeyboard()
-        let paddleState = paddleTick gameState.PaddleState keyboardState
-        let (newBallState, newActiveBlocks) = ballTick paddleState gameState.ActiveBlocks gameState.BallState
 
-        gameState <- {BallState = newBallState; PaddleState=paddleState; ActiveBlocks = newActiveBlocks}        
+        let newPaddlePos = paddleTick gameState.PaddleState.Position keyboardState
+        let newPaddleState = {gameState.PaddleState with Position = newPaddlePos}
+        gameState <- {gameState with PaddleState = newPaddleState}  
+
+        let (newBallState, newActiveBlocks) = ballTick gameState.PaddleState.Position gameState.ActiveBlocks gameState.BallState
+        gameState <- {gameState with BallState = newBallState; ActiveBlocks = newActiveBlocks}
+
+        gameState <- updateGraphics gameState
         draw win textures gameState
         
         ()

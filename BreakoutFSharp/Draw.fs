@@ -28,28 +28,26 @@ module Draw =
             |> List.find (matchText desiredTexture)
         texture
 
-    let generateBallSprite textures (ballState:BallState) =
-        let c = new CircleShape(ballWidth/2.0f)
-        c.Texture <- getTexture textures "blue"
-        c.Position <- new Vector2f(ballState.Position.X, ballState.Position.Y)
-        c
+    let updateBallSprite (ballState : BallState) =
+        ballState.Sprite.Position <- new Vector2f(ballState.Position.X, ballState.Position.Y)
+        ballState
+        
+    let updatePaddleSprite (paddleState:PaddleState) =
+        paddleState.Sprite.Position <- new Vector2f(paddleState.Position.X, paddleState.Position.Y)
+        paddleState
 
-    let generatePaddleSprite textures paddleState =
-        let p = new RectangleShape(new Vector2f(paddleWidth, paddleHeight))
-        p.Texture <- getTexture textures "red"
-        p.Position <- new Vector2f(paddleState.X, paddleState.Y)
-        p
+    let updateGraphics gameState =
+        let ballState = updateBallSprite gameState.BallState
+        let paddleState = updatePaddleSprite gameState.PaddleState
+        {gameState with BallState = ballState; PaddleState = paddleState}
 
 
     let draw (win:RenderWindow) textures gameState =
         win.Clear Color.Black
-        let listbuilder = new ListBuilder()
 
-        let ballSprite = generateBallSprite textures gameState.BallState
-        let paddleSprite = generatePaddleSprite textures gameState.PaddleState
+        gameState.BallState.Sprite.Draw(win, RenderStates.Default)
+        gameState.PaddleState.Sprite.Draw(win, RenderStates.Default)
 
-        ballSprite.Draw(win, RenderStates.Default)
-        paddleSprite.Draw(win, RenderStates.Default)
         List.map (fun (s:BlockState)-> s.Sprite.Draw(win,RenderStates.Default)) gameState.ActiveBlocks |> ignore
         win.Display()
         ()

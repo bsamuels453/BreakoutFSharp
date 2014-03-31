@@ -13,9 +13,13 @@ module GameTypes =
     type BallState = {
         Position : Vec2
         Velocity : Vec2
+        Sprite : CircleShape
         }
     
-    type PaddleState = Vec2
+    type PaddleState = {
+        Position : Vec2
+        Sprite : RectangleShape
+        }
 
     type KeyState =
         | Pressed

@@ -75,9 +75,6 @@ let main argv =
     let mutable renderState = genDefaultRenderState gameState textures
     let stopwatch = new Stopwatch()
 
-    let mutable samples = 0
-    let mutable total = 0.0
-
     while win.IsOpen() do
         throttleTo60fps()
         stopwatch.Start()
@@ -96,6 +93,6 @@ let main argv =
         draw win renderState
 
         let idleTime = getIdleTime stopwatch
-        executeEveryHundred (fun () -> System.Console.WriteLine("Idle: " + string (100.0 - idleTime * 100.0) + "%"))
+        executeEveryHundred (fun () -> System.Console.WriteLine("Idle during " + string (100.0 - idleTime * 100.0) + "% of 16.6ms timeslice"))
         stopwatch.Reset()
     0

@@ -5,7 +5,9 @@ open System;
 open GameTypes;
 open Draw;
 open Update;
+open System.Threading;
 open System.IO;
+open System.Diagnostics;
 
 let initializeWindow() =
     let win = new RenderWindow(new VideoMode(uint32 screenWidth,uint32 screenHeight), "Breakout F#")
@@ -35,6 +37,35 @@ let genDefaultGameState textures =
     ActiveBlocks = genStartBlocks textures
     }
 
+let throttleTo60fps =
+    let sw = new Stopwatch()
+    sw.Start()
+    let rec loopUntilFrameEnd() =
+        sw.Stop()
+        let elapsed = sw.Elapsed.TotalMilliseconds
+        if elapsed >= 16.6 then
+            sw.Restart()
+        else
+            sw.Start()
+            let a = [1..100]
+            loopUntilFrameEnd()
+    loopUntilFrameEnd
+    
+let getIdleTime (sw:Stopwatch) =
+    sw.Stop()
+    let elapsed = sw.Elapsed.TotalMilliseconds
+    elapsed / 16.6
+
+let executeEveryHundred =
+    let count = ref 0
+    (fun c -> 
+        if !count = 100 then
+            count:=0
+            c()
+        else
+            count := !count + 1    
+    )
+
 [<EntryPoint>]
 [<STAThread>]
 let main argv =
@@ -42,8 +73,15 @@ let main argv =
     let textures = loadTextures()
     let mutable gameState = genDefaultGameState()
     let mutable renderState = genDefaultRenderState gameState textures
+    let stopwatch = new Stopwatch()
+
+    let mutable samples = 0
+    let mutable total = 0.0
 
     while win.IsOpen() do
+        throttleTo60fps()
+        stopwatch.Start()
+
         win.DispatchEvents()
         let keyboardState = pollKeyboard()
 
@@ -56,6 +94,8 @@ let main argv =
 
         renderState <- updateRenderState renderState gameState
         draw win renderState
-        
-        ()
+
+        let idleTime = getIdleTime stopwatch
+        executeEveryHundred (fun () -> System.Console.WriteLine("Idle: " + string (100.0 - idleTime * 100.0) + "%"))
+        stopwatch.Reset()
     0

@@ -65,28 +65,31 @@ module Draw =
 
 
     let updateRenderState renderState gameState =
-        let mutable drawableSprites = renderState.Sprites
+        let mutable drawableSprites = renderState.Sprites |> Array.ofList
 
         if drawablesToAdd.Length <> 0 then
-            drawableSprites <- List.append drawableSprites drawablesToAdd
-            drawableSprites <- List.sortBy (fun elem -> elem.ZLayer) drawableSprites
+            drawableSprites <- Array.append drawableSprites (Array.ofList drawablesToAdd)
+            drawableSprites <- Array.sortBy (fun elem -> elem.ZLayer) drawableSprites
             drawablesToAdd <- []
 
-        drawableSprites <- drawableSprites |> List.filter (fun elem -> not( drawablesToRemove |> List.exists elem.Id.Equals))
-
-        let newRenderState = {Sprites=drawableSprites}
-
-
+        drawableSprites <- drawableSprites |> Array.filter (fun elem -> not( drawablesToRemove |> List.exists elem.Id.Equals))
         drawablesToRemove <- []
 
-        drawableSprites <- drawableSprites |> List.map (fun spriteState ->
-            if drawablesToUpdate |> List.exists spriteState.Id.Equals then
-                spriteState.Update newRenderState gameState spriteState
-            else
-                spriteState
-        )
+        let newRenderState = {Sprites=List.ofArray drawableSprites}
 
-        {renderState with Sprites = drawableSprites}
+        let rec applyUpdates sprites updates =
+            match updates with
+            | [] -> ()
+            | h::t ->
+                let idx = sprites |> Array.findIndex (fun s -> s.Id.Equals h)
+                let sprite = sprites.[idx]
+                sprites.[idx] <- sprite.Update newRenderState gameState sprite
+                applyUpdates sprites t
+
+        applyUpdates drawableSprites drawablesToUpdate
+        drawablesToUpdate <- []
+
+        {renderState with Sprites = List.ofArray drawableSprites}
 
     let draw (win:RenderWindow) renderState =
         win.Clear Color.Black

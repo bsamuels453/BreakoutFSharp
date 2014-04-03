@@ -18,17 +18,17 @@ let initializeWindow() =
 let genStartBlocks () =
     [for x in blockXCoords do
         for y in blockYCoords ->
-            {Position={X=x; Y=y}; BlockId=generateBlockId()}
+            {Position={X=x; Y=y}; BlockId=generateSpriteId()}
     ]
 
 let genDefaultBallState textures =
     let position = {X=300.0f; Y=300.0f}
     let velocity = {X=initlBallSpeed; Y=initlBallSpeed}
-    {Position=position; Velocity=velocity; BallId=generateBallId()}
+    {Position=position; Velocity=velocity; BallId=generateSpriteId()}
 
 let genDefaultPaddleState textures : PaddleState =
     let position = {X=400.0f; Y=screenHeight - paddleXAxis};
-    {Position=position; PaddleId=generatePaddleId()}
+    {Position=position; PaddleId=generateSpriteId()}
 
 let genDefaultGameState textures =
     {
@@ -72,7 +72,8 @@ let main argv =
     let win = initializeWindow()
     let textures = loadTextures()
     let mutable gameState = genDefaultGameState()
-    let mutable renderState = genDefaultRenderState gameState textures
+    let mutable renderState = {Sprites=[]}
+    generateDefaultScene gameState textures
     let stopwatch = new Stopwatch()
 
     while win.IsOpen() do

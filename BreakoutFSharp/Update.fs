@@ -17,7 +17,7 @@ module Update =
         if aState=Pressed && dState=Pressed ||aState=Released && dState=Released then
             oldPaddleState.Position
         else
-            queueObjectUpdate oldPaddleState.PaddleId
+            queueSpriteUpdate oldPaddleState.PaddleId
             if aState=Pressed then
                restrictPaddlePos {X=oldPaddleState.Position.X - paddleSpeed; Y=oldPaddleState.Position.Y}
             else
@@ -91,7 +91,7 @@ module Update =
                 activeBlocks
                 |> List.filter (fun b -> not <| List.exists b.Equals collideBlocks)
 
-            collideBlocks |> List.map (fun b -> queueObjectUpdate b.BlockId) |> ignore
+            collideBlocks |> List.map (fun b -> queueSpriteDeletion b.BlockId) |> ignore
             (newActiveBlocks, resolvedVel)
 
     let ballTick paddleState activeBlocks prevBallState =
@@ -100,5 +100,5 @@ module Update =
         let (newActiveBlocks ,blockResolvedVelocity) = resolveBlockCollision activeBlocks {prevBallState with Velocity = paddleResolvedVelocity}
 
         let collisionResolvedBallState = {prevBallState with Velocity = blockResolvedVelocity}
-        queueObjectUpdate prevBallState.BallId
+        queueSpriteUpdate prevBallState.BallId
         (calcNewBallPos collisionResolvedBallState, newActiveBlocks)

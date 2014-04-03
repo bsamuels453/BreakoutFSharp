@@ -18,17 +18,17 @@ let initializeWindow() =
 let genStartBlocks () =
     [for x in blockXCoords do
         for y in blockYCoords ->
-            {Position={X=x; Y=y}}
+            {Position={X=x; Y=y}; BlockId=generateBlockId()}
     ]
 
 let genDefaultBallState textures =
     let position = {X=300.0f; Y=300.0f}
     let velocity = {X=initlBallSpeed; Y=initlBallSpeed}
-    {Position=position; Velocity=velocity}
+    {Position=position; Velocity=velocity; BallId=generateBallId()}
 
 let genDefaultPaddleState textures : PaddleState =
     let position = {X=400.0f; Y=screenHeight - paddleXAxis};
-    {Position=position}
+    {Position=position; PaddleId=generatePaddleId()}
 
 let genDefaultGameState textures =
     {
@@ -82,7 +82,7 @@ let main argv =
         win.DispatchEvents()
         let keyboardState = pollKeyboard()
 
-        let newPaddlePos = paddleTick gameState.PaddleState.Position keyboardState
+        let newPaddlePos = paddleTick gameState.PaddleState keyboardState
         let newPaddleState = {gameState.PaddleState with Position = newPaddlePos}
         gameState <- {gameState with PaddleState = newPaddleState}  
 

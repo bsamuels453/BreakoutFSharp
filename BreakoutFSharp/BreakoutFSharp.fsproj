@@ -59,10 +59,11 @@
   <ItemGroup>
     <None Include="App.config" />
     <Compile Include="GameTypes.fs" />
+    <Compile Include="GameFunctions.fs" />
     <Compile Include="GameConsts.fs" />
     <Compile Include="Control.fs" />
-    <Compile Include="Update.fs" />
     <Compile Include="Draw.fs" />
+    <Compile Include="Update.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <PropertyGroup>

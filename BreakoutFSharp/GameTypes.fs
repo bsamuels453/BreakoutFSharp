@@ -10,12 +10,19 @@ module GameTypes =
         Y : float32
         }
 
+    type ObjectId =
+        | PaddleId of int
+        | BallId of int
+        | BlockId of int
+
     type BallState = {
+        BallId : ObjectId
         Position : Vec2
         Velocity : Vec2
         }
     
     type PaddleState = {
+        PaddleId : ObjectId
         Position : Vec2
         }
 
@@ -29,6 +36,7 @@ module GameTypes =
     }
 
     type BlockState = {
+        BlockId : ObjectId
         Position:Vec2   
     }
 
@@ -38,10 +46,26 @@ module GameTypes =
         ActiveBlocks:BlockState list
     }
 
+
+    type BallSpriteState ={
+        Sprite : CircleShape
+        Id : ObjectId
+    }
+
+    type PaddleSpriteState ={
+        Sprite : RectangleShape
+        Id : ObjectId
+    }
+
+    type BlockSpriteState ={
+        Sprite : RectangleShape
+        Id : ObjectId
+    }
+
     type RenderState = {
-        BallSprite : CircleShape
-        PaddleSprite : RectangleShape
-        BlockSprites: RectangleShape list
+        BallSprite : BallSpriteState
+        PaddleSprite : PaddleSpriteState
+        BlockSprites: BlockSpriteState list
     }
 
     type ListBuilder() =

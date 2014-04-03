@@ -4,7 +4,7 @@
 module Update =
     open SFML.Window;
 
-    let paddleTick oldPaddlePos keyboardState =
+    let paddleTick (oldPaddleState:PaddleState) keyboardState=
         let restrictPaddlePos pos =
             if pos.X > (screenWidth - paddleWidth) then
                 {X=screenWidth-paddleWidth; Y=pos.Y} 
@@ -15,12 +15,13 @@ module Update =
         let aState = (getKeyState keyboardState Keyboard.Key.A).KeyState
         let dState = (getKeyState keyboardState Keyboard.Key.D).KeyState
         if aState=Pressed && dState=Pressed ||aState=Released && dState=Released then
-            oldPaddlePos
+            oldPaddleState.Position
         else
+            queueObjectUpdate oldPaddleState.PaddleId
             if aState=Pressed then
-               restrictPaddlePos {X=oldPaddlePos.X - paddleSpeed; Y=oldPaddlePos.Y} 
+               restrictPaddlePos {X=oldPaddleState.Position.X - paddleSpeed; Y=oldPaddleState.Position.Y}
             else
-               restrictPaddlePos {X=oldPaddlePos.X + paddleSpeed; Y=oldPaddlePos.Y} 
+               restrictPaddlePos {X=oldPaddleState.Position.X + paddleSpeed; Y=oldPaddleState.Position.Y}
 
     let calcNewBallPos (ballState:BallState) =
         let xPos = ballState.Position.X + ballState.Velocity.X
@@ -89,6 +90,8 @@ module Update =
             let newActiveBlocks =  
                 activeBlocks
                 |> List.filter (fun b -> not <| List.exists b.Equals collideBlocks)
+
+            collideBlocks |> List.map (fun b -> queueObjectUpdate b.BlockId) |> ignore
             (newActiveBlocks, resolvedVel)
 
     let ballTick paddleState activeBlocks prevBallState =
@@ -97,4 +100,5 @@ module Update =
         let (newActiveBlocks ,blockResolvedVelocity) = resolveBlockCollision activeBlocks {prevBallState with Velocity = paddleResolvedVelocity}
 
         let collisionResolvedBallState = {prevBallState with Velocity = blockResolvedVelocity}
+        queueObjectUpdate prevBallState.BallId
         (calcNewBallPos collisionResolvedBallState, newActiveBlocks)

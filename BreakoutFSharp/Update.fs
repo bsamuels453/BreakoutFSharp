@@ -61,7 +61,7 @@ module Update =
         let collideBlocks = activeBlocks |> List.filter (fun block -> 
             rectangleOverlap desiredPosition ballDims block.Position blockDims) 
         if collideBlocks.Length = 0 then
-            (activeBlocks, ballState.Velocity)
+            (activeBlocks, ballState)
         else
             let getReflectionAxis block =
                 let leftDist = abs <| (desiredPosition.X + ballWidth) - block.Position.X
@@ -92,13 +92,20 @@ module Update =
                 |> List.filter (fun b -> not <| List.exists b.Equals collideBlocks)
 
             collideBlocks |> List.map (fun b -> queueSpriteDeletion b.BlockId) |> ignore
-            (newActiveBlocks, resolvedVel)
+            (newActiveBlocks, {ballState with Velocity=resolvedVel; NumBounces=ballState.NumBounces+1} )
+
+    let incrementBallSpeed ballState =
+        if ballState.NumBounces % 5 = 0 then
+            {ballState with Velocity = {X=ballState.Velocity.X*1.1f; Y=ballState.Velocity.Y*1.1f}; NumBounces = ballState.NumBounces+1}
+        else
+            ballState
 
     let ballTick paddleState activeBlocks prevBallState =
         let boundaryResolvedVelocity = resolveBoundaryCollision prevBallState
         let paddleResolvedVelocity = resolvePaddleCollision paddleState {prevBallState with Velocity = boundaryResolvedVelocity}
-        let (newActiveBlocks ,blockResolvedVelocity) = resolveBlockCollision activeBlocks {prevBallState with Velocity = paddleResolvedVelocity}
+        let (newActiveBlocks ,collisionResolvedBallState) = resolveBlockCollision activeBlocks {prevBallState with Velocity = paddleResolvedVelocity}
 
-        let collisionResolvedBallState = {prevBallState with Velocity = blockResolvedVelocity}
-        queueSpriteUpdate prevBallState.BallId
-        (calcNewBallPos collisionResolvedBallState, newActiveBlocks)
+        let speedAdjustedBallState = incrementBallSpeed collisionResolvedBallState
+
+        queueSpriteUpdate speedAdjustedBallState.BallId
+        (calcNewBallPos speedAdjustedBallState, newActiveBlocks)

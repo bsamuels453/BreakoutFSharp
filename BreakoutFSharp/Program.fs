@@ -24,7 +24,7 @@ let genStartBlocks () =
 let genDefaultBallState textures =
     let position = {X=300.0f; Y=300.0f}
     let velocity = {X=initlBallSpeed; Y=initlBallSpeed}
-    {Position=position; Velocity=velocity; BallId=generateSpriteId()}
+    {Position=position; Velocity=velocity; BallId=generateSpriteId(); NumBounces=1}
 
 let genDefaultPaddleState textures : PaddleState =
     let position = {X=400.0f; Y=screenHeight - paddleXAxis};

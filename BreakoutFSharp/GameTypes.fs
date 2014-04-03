@@ -16,6 +16,7 @@ module GameTypes =
         BallId : ObjectId
         Position : Vec2
         Velocity : Vec2
+        NumBounces : int
         }
     
     type PaddleState = {

@@ -10,10 +10,7 @@ module GameTypes =
         Y : float32
         }
 
-    type ObjectId =
-        | PaddleId of int
-        | BallId of int
-        | BlockId of int
+    type ObjectId = int
 
     type BallState = {
         BallId : ObjectId
@@ -46,27 +43,17 @@ module GameTypes =
         ActiveBlocks:BlockState list
     }
 
-
-    type BallSpriteState ={
-        Sprite : CircleShape
-        Id : ObjectId
-    }
-
-    type PaddleSpriteState ={
-        Sprite : RectangleShape
-        Id : ObjectId
-    }
-
-    type BlockSpriteState ={
-        Sprite : RectangleShape
-        Id : ObjectId
-    }
-
     type RenderState = {
-        BallSprite : BallSpriteState
-        PaddleSprite : PaddleSpriteState
-        BlockSprites: BlockSpriteState list
+        Sprites : SpriteState list
+    } 
+
+    and SpriteState = {
+        Id : ObjectId
+        ZLayer : float
+        Sprite : Shape
+        Update : (RenderState -> GameState -> SpriteState -> SpriteState)
     }
+
 
     type ListBuilder() =
         member this.Bind(m, f) = 

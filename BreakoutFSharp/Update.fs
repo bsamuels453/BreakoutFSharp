@@ -92,6 +92,7 @@ module Update =
                 |> List.filter (fun b -> not <| List.exists b.Equals collideBlocks)
 
             collideBlocks |> List.map (fun b -> queueSpriteDeletion b.BlockId) |> ignore
+            collideBlocks |> List.map (fun b -> genFallingBlockAnim ballState.Position b.Position) |> ignore
             (newActiveBlocks, {ballState with Velocity=resolvedVel; NumBounces=ballState.NumBounces+1} )
 
     let incrementBallSpeed ballState =

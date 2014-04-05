@@ -51,6 +51,7 @@ module GameTypes =
     and SpriteState = {
         Id : ObjectId
         ZLayer : float
+        AutoUpdate : bool
         Sprite : Shape
         Update : (RenderState -> GameState -> SpriteState -> SpriteState)
     }

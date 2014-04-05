@@ -1,12 +1,11 @@
 ﻿namespace global
 
-[<AutoOpen>]
 module SpriteGen =
     open SFML.Graphics;
     open SFML.Window;
     open System.Diagnostics;
 
-    let genDefaultPaddleSprite gameState =
+    let GenDefaultPaddleSprite gameState =
         let createSprite textures =
             let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
             sprite.Texture <- Resource.GetTexture textures "red"
@@ -19,7 +18,7 @@ module SpriteGen =
             {Sprite=sprite; Id=gameState.PaddleState.PaddleId; ZLayer = 1.0; Update=updatePaddle; AutoUpdate=false}
         Draw.QueueSpriteAddition createSprite
 
-    let genFallingBlockAnim ballPos blockPos =
+    let GenFallingBlockAnim ballPos blockPos =
         let createSprite (textures:(string*Texture) list) =
             let idx = List.findIndex blockPos.Y.Equals blockYCoords
             let texture = snd textures.[idx]
@@ -55,11 +54,11 @@ module SpriteGen =
                 s.Sprite.FillColor <- color
                 s
 
-            {Sprite=sprite; Id=generateSpriteId(); ZLayer= 1.0; Update=updateAnim; AutoUpdate=true}
+            {Sprite=sprite; Id=GenerateSpriteId(); ZLayer= 1.0; Update=updateAnim; AutoUpdate=true}
         Draw.QueueSpriteAddition createSprite
         ()
 
-    let genDefaultBallSprite gameState =
+    let GenDefaultBallSprite gameState =
         let createSprite textures =
             let sprite = new CircleShape(ballWidth/2.0f)
             sprite.Texture <- Resource.GetTexture textures "blue"
@@ -72,7 +71,7 @@ module SpriteGen =
             {Sprite=sprite; Id=gameState.BallState.BallId; ZLayer = 1.0; Update=updateBall; AutoUpdate=false}
         Draw.QueueSpriteAddition createSprite
 
-    let genDefaultBlockSprites gameState =
+    let GenDefaultBlockSprites gameState =
         let updateBlock renderState gameState (sprite:SpriteState) = sprite
 
         gameState.ActiveBlocks |> List.map (fun block ->
@@ -87,7 +86,7 @@ module SpriteGen =
             Draw.QueueSpriteAddition createSprite
             )
 
-    let generateDefaultScene gameState =
-            genDefaultPaddleSprite gameState |> ignore
-            genDefaultBallSprite gameState |> ignore
-            genDefaultBlockSprites gameState |> ignore
+    let GenerateDefaultScene gameState =
+            GenDefaultPaddleSprite gameState |> ignore
+            GenDefaultBallSprite gameState |> ignore
+            GenDefaultBlockSprites gameState |> ignore

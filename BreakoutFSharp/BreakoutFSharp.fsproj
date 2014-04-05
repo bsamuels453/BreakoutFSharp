@@ -66,6 +66,7 @@
     <Compile Include="Draw.fs" />
     <Compile Include="SpriteGen.fs" />
     <Compile Include="Update.fs" />
+    <Compile Include="Initialization.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <PropertyGroup>

@@ -96,7 +96,7 @@ module Update =
 
     let incrementBallSpeed ballState =
         if ballState.NumBounces % 5 = 0 then
-            {ballState with Velocity = {X=ballState.Velocity.X*1.1f; Y=ballState.Velocity.Y*1.1f}; NumBounces = ballState.NumBounces+1}
+            {ballState with Velocity = {X=ballState.Velocity.X*1.05f; Y=ballState.Velocity.Y*1.05f}; NumBounces = ballState.NumBounces+1}
         else
             ballState
 

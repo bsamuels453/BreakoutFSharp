@@ -12,7 +12,7 @@ module GameConsts =
     let numBlockRows = 6.0f
     let blockHeight = 0.23f * screenHeight/numBlockRows
     let blockWidth = screenWidth/numBlockCols
-    let paddleSpeed = 3.5f
+    let paddleSpeed = 5.5f
     let initlBallSpeed = 2.80f
 
     let blockXCoords = [for x in 0..(int numBlockCols-1) -> float32 x * blockWidth]

@@ -18,19 +18,23 @@ module Draw =
     let QueueSpriteDeletion objectId =
         drawablesToRemove <- List.Cons (objectId, drawablesToRemove)
 
+    let private addSprites drawableSprites spritesToAdd textures =
+        let generatedSprites = spritesToAdd |> List.map (fun f -> f textures)
+        generatedSprites
+            |> List.append drawableSprites
+            |> List.sortBy (fun elem -> elem.ZLayer)
+
     let UpdateRenderState renderState gameState textures =
-        let mutable drawableSprites = renderState.Sprites |> Array.ofList
+        let drawableSprites = 
+            match drawablesToAdd.Length with
+            | 0 -> renderState.Sprites
+            | _ -> addSprites renderState.Sprites drawablesToAdd textures
+        drawablesToAdd <- []
 
-        if drawablesToAdd.Length <> 0 then
-            let generatedSprites = drawablesToAdd |> List.map (fun f -> f textures)
-            drawableSprites <- Array.append drawableSprites (Array.ofList generatedSprites)
-            drawableSprites <- Array.sortBy (fun elem -> elem.ZLayer) drawableSprites
-            drawablesToAdd <- []
-
-        drawableSprites <- drawableSprites |> Array.filter (fun elem -> not( drawablesToRemove |> List.exists elem.Id.Equals))
+        let filteredSprites =  drawableSprites |> List.filter (fun elem -> not (List.exists (elem.Id.Equals) drawablesToRemove ))
         drawablesToRemove <- []
 
-        let newRenderState = {Sprites=List.ofArray drawableSprites}
+        let newRenderState = {Sprites=filteredSprites}
 
         let rec applyUpdates sprites updates =
             match updates with
@@ -40,19 +44,19 @@ module Draw =
                 let sprite = sprites.[idx]
                 sprites.[idx] <- sprite.Update newRenderState gameState sprite
                 applyUpdates sprites t
-
+                
         let autoUpdateSprites = 
-            drawableSprites 
-            |> Array.filter (fun sp -> sp.AutoUpdate)
-            |> Array.map (fun sp -> sp.Id)
-            |> List.ofArray
+            filteredSprites 
+            |> List.filter (fun sp -> sp.AutoUpdate)
+            |> List.map (fun sp -> sp.Id)
 
         drawablesToUpdate <- List.append drawablesToUpdate autoUpdateSprites
 
-        applyUpdates drawableSprites drawablesToUpdate
+        let newSprites = Array.ofList filteredSprites
+        applyUpdates newSprites drawablesToUpdate
         drawablesToUpdate <- []
 
-        {renderState with Sprites = List.ofArray drawableSprites}
+        {renderState with Sprites = List.ofArray newSprites}
 
     let Draw (win:RenderWindow) renderState =
         win.Clear Color.Black

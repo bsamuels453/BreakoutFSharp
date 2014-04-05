@@ -62,6 +62,7 @@
     <Compile Include="GameFunctions.fs" />
     <Compile Include="GameConsts.fs" />
     <Compile Include="Control.fs" />
+    <Compile Include="Resource.fs" />
     <Compile Include="Draw.fs" />
     <Compile Include="Update.fs" />
     <Compile Include="Program.fs" />

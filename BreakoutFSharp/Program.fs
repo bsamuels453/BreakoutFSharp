@@ -70,7 +70,7 @@ let executeEveryHundred =
 [<STAThread>]
 let main argv =
     let win = initializeWindow()
-    let textures = loadTextures()
+    let textures = LoadTextures()
     let mutable gameState = genDefaultGameState()
     let mutable renderState = {Sprites=[]}
     generateDefaultScene gameState

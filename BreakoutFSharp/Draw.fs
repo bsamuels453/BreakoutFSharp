@@ -7,28 +7,6 @@ module Draw =
     open SFML.Audio;
     open System.Diagnostics;
 
-    let loadTextures() =
-        let listbuilder = new ListBuilder()
-        listbuilder{
-            yield "red", new Texture("redsplotch.jpg")
-            yield "orange", new Texture("orangesplotch.jpg")
-            yield "yellow", new Texture("yellowsplotch.jpg")
-            yield "green", new Texture("greensplotch.jpg")
-            yield "cyan", new Texture("cyansplotch.jpg")
-            yield "blue", new Texture("bluesplotch.jpg")
-            yield "purple", new Texture("purplesplotch.jpg")
-        }
-
-    let getTexture textures desiredTexture =
-        let matchText text comp =
-            match comp with
-            | (t,_) when t = text -> true
-            | _ -> false
-        let (_,texture) =
-            textures
-            |> List.find (matchText desiredTexture)
-        texture
-
     let mutable private drawablesToUpdate:ObjectId list = []
     let mutable private drawablesToAdd:((string*Texture) list -> SpriteState) list = []
     let mutable private drawablesToRemove:ObjectId list = []
@@ -89,7 +67,7 @@ module Draw =
     let genDefaultPaddleSprite gameState =
         let createSprite textures =
             let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
-            sprite.Texture <- getTexture textures "red"
+            sprite.Texture <- GetTexture textures "red"
             sprite.Position <- new Vector2f(gameState.PaddleState.Position.X, gameState.PaddleState.Position.Y)
             let updatePaddle renderState gameState (sprite:SpriteState) =
                 let paddleState = gameState.PaddleState
@@ -142,7 +120,7 @@ module Draw =
     let genDefaultBallSprite gameState =
         let createSprite textures =
             let sprite = new CircleShape(ballWidth/2.0f)
-            sprite.Texture <- getTexture textures "blue"
+            sprite.Texture <- GetTexture textures "blue"
             sprite.Position <- new Vector2f(gameState.BallState.Position.X, gameState.BallState.Position.Y)
             let updateBall renderState gameState (sprite:SpriteState) =
                 let ballState = gameState.BallState

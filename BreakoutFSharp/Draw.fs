@@ -185,7 +185,7 @@ module Draw =
                 let sprite = new RectangleShape(new Vector2f(blockWidth, blockHeight))
                 sprite.Texture <- texture
                 sprite.Position <- new Vector2f(block.Position.X, block.Position.Y)
-                {Sprite=sprite; Id=block.BlockId; ZLayer = 1.0; Update=updateBlock; AutoUpdate=false}
+                {Sprite=sprite; Id=block.BlockId; ZLayer = 0.0; Update=updateBlock; AutoUpdate=false}
 
             queueSpriteAddition createSprite
             )

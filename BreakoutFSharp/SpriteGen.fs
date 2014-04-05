@@ -25,7 +25,7 @@ module SpriteGen =
             let texture = snd textures.[idx]
             let sprite = new RectangleShape(new Vector2f(blockWidth, blockHeight));
             sprite.Texture <- texture
-            sprite.Position <- new Vector2f(blockPos.X, blockPos.Y)
+            sprite.Position <- blockPos.ToVec2f()
 
             let displayTime = 1.0
             let origPos = sprite.Position
@@ -63,10 +63,10 @@ module SpriteGen =
         let createSprite textures =
             let sprite = new CircleShape(ballWidth/2.0f)
             sprite.Texture <- Resource.GetTexture textures "blue"
-            sprite.Position <- new Vector2f(gameState.BallState.Position.X, gameState.BallState.Position.Y)
+            sprite.Position <- gameState.BallState.Position.ToVec2f()
             let updateBall renderState gameState (sprite:SpriteState) =
                 let ballState = gameState.BallState
-                sprite.Sprite.Position <- new Vector2f(ballState.Position.X, ballState.Position.Y)
+                sprite.Sprite.Position <- ballState.Position.ToVec2f()
                 sprite
 
             {Sprite=sprite; Id=gameState.BallState.BallId; ZLayer = 1.0; Update=updateBall; AutoUpdate=false}
@@ -81,7 +81,7 @@ module SpriteGen =
                 let texture = snd textures.[idx]
                 let sprite = new RectangleShape(new Vector2f(blockWidth, blockHeight))
                 sprite.Texture <- texture
-                sprite.Position <- new Vector2f(block.Position.X, block.Position.Y)
+                sprite.Position <- block.Position.ToVec2f()
                 {Sprite=sprite; Id=block.BlockId; ZLayer = 0.0; Update=updateBlock; AutoUpdate=false}
 
             Draw.QueueSpriteAddition createSprite

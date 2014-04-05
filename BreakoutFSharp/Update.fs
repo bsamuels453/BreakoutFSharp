@@ -77,8 +77,7 @@ module Update =
         let desiredPosition = (calcNewBallPos ballState).Position
         let ballDims = {X=ballWidth; Y=ballWidth}
         let blockDims = {X=blockWidth; Y=blockHeight}
-        let collideBlocks = activeBlocks |> List.filter (fun block -> 
-            rectangleOverlap desiredPosition ballDims block.Position blockDims) 
+        let collideBlocks = activeBlocks |> List.filter (fun block -> rectangleOverlap desiredPosition ballDims block.Position blockDims) 
         if collideBlocks.Length = 0 then
             (activeBlocks, ballState)
         else

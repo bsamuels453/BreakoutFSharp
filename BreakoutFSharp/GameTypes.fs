@@ -5,12 +5,12 @@ module GameTypes =
     open SFML.Window
     open SFML.Graphics
 
-    type Vec2 = {
-        X : float32
-        Y : float32
-        }
-
-    type ObjectId = int
+    type Vec2 = {X : float32; Y : float32}
+        with 
+            static member (*) (f : float32, a) = {X=a.X*f; Y=a.Y*f}
+            static member (*) (a, f : float32) = {X=a.X*f; Y=a.Y*f}
+            static member (+) (a, b) = {X=a.X+b.X; Y=a.Y+b.Y}
+            member this.ToVec2f() = new Vector2f(this.X, this.Y)
     
     type ObjectId = ObjectId of int
 

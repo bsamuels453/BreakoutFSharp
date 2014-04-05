@@ -100,7 +100,7 @@ module Draw =
         win.Display()
         ()
 
-    let genDefaultPaddleSprite gameState textures =
+    let genDefaultPaddleSprite gameState =
         let createSprite textures =
             let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
             sprite.Texture <- getTexture textures "red"
@@ -114,7 +114,7 @@ module Draw =
         queueSpriteAddition createSprite
 
 
-    let genDefaultBallSprite gameState textures =
+    let genDefaultBallSprite gameState =
         let createSprite textures =
             let sprite = new CircleShape(ballWidth/2.0f)
             sprite.Texture <- getTexture textures "blue"
@@ -127,7 +127,7 @@ module Draw =
             {Sprite=sprite; Id=gameState.BallState.BallId; ZLayer = 1.0; Update=updateBall}
         queueSpriteAddition createSprite
 
-    let genDefaultBlockSprites gameState (textures:(string*Texture) list)=
+    let genDefaultBlockSprites gameState =
         let updateBlock renderState gameState (sprite:SpriteState) = sprite
 
         gameState.ActiveBlocks |> List.map (fun block ->
@@ -142,7 +142,7 @@ module Draw =
             queueSpriteAddition createSprite
             )
 
-    let generateDefaultScene gameState textures =
-            genDefaultPaddleSprite gameState textures |> ignore
-            genDefaultBallSprite gameState textures |> ignore
-            genDefaultBlockSprites gameState textures |> ignore
+    let generateDefaultScene gameState =
+            genDefaultPaddleSprite gameState |> ignore
+            genDefaultBallSprite gameState |> ignore
+            genDefaultBlockSprites gameState |> ignore

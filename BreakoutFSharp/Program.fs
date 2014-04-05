@@ -21,20 +21,20 @@ let genStartBlocks () =
             {Position={X=x; Y=y}; BlockId=generateSpriteId()}
     ]
 
-let genDefaultBallState textures =
+let genDefaultBallState() =
     let position = {X=300.0f; Y=300.0f}
     let velocity = {X=initlBallSpeed; Y=initlBallSpeed}
     {Position=position; Velocity=velocity; BallId=generateSpriteId(); NumBounces=1}
 
-let genDefaultPaddleState textures : PaddleState =
+let genDefaultPaddleState() : PaddleState =
     let position = {X=400.0f; Y=screenHeight - paddleXAxis};
     {Position=position; PaddleId=generateSpriteId()}
 
-let genDefaultGameState textures =
+let genDefaultGameState() =
     {
-    BallState = genDefaultBallState textures
-    PaddleState = genDefaultPaddleState textures
-    ActiveBlocks = genStartBlocks textures
+    BallState = genDefaultBallState()
+    PaddleState = genDefaultPaddleState()
+    ActiveBlocks = genStartBlocks()
     }
 
 let throttleTo60fps =
@@ -73,7 +73,7 @@ let main argv =
     let textures = loadTextures()
     let mutable gameState = genDefaultGameState()
     let mutable renderState = {Sprites=[]}
-    generateDefaultScene gameState textures
+    generateDefaultScene gameState
     let stopwatch = new Stopwatch()
 
     while win.IsOpen() do

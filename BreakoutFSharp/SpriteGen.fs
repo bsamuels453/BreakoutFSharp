@@ -17,7 +17,7 @@ module SpriteGen =
                 sprite
 
             {Sprite=sprite; Id=gameState.PaddleState.PaddleId; ZLayer = 1.0; Update=updatePaddle; AutoUpdate=false}
-        queueSpriteAddition createSprite
+        Draw.QueueSpriteAddition createSprite
 
     let genFallingBlockAnim ballPos blockPos =
         let createSprite (textures:(string*Texture) list) =
@@ -42,7 +42,7 @@ module SpriteGen =
                 let elapsed = sw.Elapsed.TotalSeconds
                 
                 if elapsed > displayTime then
-                    queueSpriteDeletion s.Id
+                    Draw.QueueSpriteDeletion s.Id
                 else sw.Start()
 
                 let deltaY = initlVelocityY * elapsed + 0.5 * accelerationY * elapsed * elapsed
@@ -56,7 +56,7 @@ module SpriteGen =
                 s
 
             {Sprite=sprite; Id=generateSpriteId(); ZLayer= 1.0; Update=updateAnim; AutoUpdate=true}
-        queueSpriteAddition createSprite
+        Draw.QueueSpriteAddition createSprite
         ()
 
     let genDefaultBallSprite gameState =
@@ -70,7 +70,7 @@ module SpriteGen =
                 sprite
 
             {Sprite=sprite; Id=gameState.BallState.BallId; ZLayer = 1.0; Update=updateBall; AutoUpdate=false}
-        queueSpriteAddition createSprite
+        Draw.QueueSpriteAddition createSprite
 
     let genDefaultBlockSprites gameState =
         let updateBlock renderState gameState (sprite:SpriteState) = sprite
@@ -84,7 +84,7 @@ module SpriteGen =
                 sprite.Position <- new Vector2f(block.Position.X, block.Position.Y)
                 {Sprite=sprite; Id=block.BlockId; ZLayer = 0.0; Update=updateBlock; AutoUpdate=false}
 
-            queueSpriteAddition createSprite
+            Draw.QueueSpriteAddition createSprite
             )
 
     let generateDefaultScene gameState =

@@ -90,8 +90,8 @@ let main argv =
         let (newBallState, newActiveBlocks) = ballTick gameState.PaddleState.Position gameState.ActiveBlocks gameState.BallState
         gameState <- {gameState with BallState = newBallState; ActiveBlocks = newActiveBlocks}
 
-        renderState <- updateRenderState renderState gameState textures
-        draw win renderState
+        renderState <- UpdateRenderState renderState gameState textures
+        Draw win renderState
 
         let idleTime = getIdleTime stopwatch
         executeEveryHundred (fun () -> System.Console.WriteLine("Idle during " + string (100.0 - idleTime * 100.0) + "% of 16.6ms timeslice"))

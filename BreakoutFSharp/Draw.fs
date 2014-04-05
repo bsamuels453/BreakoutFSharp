@@ -1,26 +1,24 @@
 ﻿namespace global
 
-[<AutoOpen>]
 module Draw =
     open SFML.Window;
     open SFML.Graphics;
     open SFML.Audio;
-    
 
     let mutable private drawablesToUpdate:ObjectId list = []
     let mutable private drawablesToAdd:((string*Texture) list -> SpriteState) list = []
     let mutable private drawablesToRemove:ObjectId list = []
 
-    let queueSpriteUpdate objectId =
+    let QueueSpriteUpdate objectId =
         drawablesToUpdate <- List.Cons (objectId, drawablesToUpdate)
 
-    let queueSpriteAddition spriteInitializer =
+    let QueueSpriteAddition spriteInitializer =
         drawablesToAdd <- List.Cons (spriteInitializer, drawablesToAdd)
 
-    let queueSpriteDeletion objectId =
+    let QueueSpriteDeletion objectId =
         drawablesToRemove <- List.Cons (objectId, drawablesToRemove)
 
-    let updateRenderState renderState gameState textures =
+    let UpdateRenderState renderState gameState textures =
         let mutable drawableSprites = renderState.Sprites |> Array.ofList
 
         if drawablesToAdd.Length <> 0 then
@@ -56,7 +54,7 @@ module Draw =
 
         {renderState with Sprites = List.ofArray drawableSprites}
 
-    let draw (win:RenderWindow) renderState =
+    let Draw (win:RenderWindow) renderState =
         win.Clear Color.Black
 
         renderState.Sprites |> List.map (fun s -> s.Sprite.Draw(win,RenderStates.Default)) |> ignore

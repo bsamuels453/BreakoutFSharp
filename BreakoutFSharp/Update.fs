@@ -17,11 +17,10 @@ module Update =
         if aState=Pressed && dState=Pressed ||aState=Released && dState=Released then
             oldPaddleState.Position
         else
-            queueSpriteUpdate oldPaddleState.PaddleId
-            if aState=Pressed then
-               restrictPaddlePos {X=oldPaddleState.Position.X - paddleSpeed; Y=oldPaddleState.Position.Y}
-            else
-               restrictPaddlePos {X=oldPaddleState.Position.X + paddleSpeed; Y=oldPaddleState.Position.Y}
+            Draw.QueueSpriteUpdate oldPaddleState.PaddleId
+            match aState with
+            | Pressed -> restrictPaddlePos {X=oldPaddleState.Position.X - paddleSpeed; Y=oldPaddleState.Position.Y}
+            | Released -> restrictPaddlePos {X=oldPaddleState.Position.X + paddleSpeed; Y=oldPaddleState.Position.Y}               
 
     let calcNewBallPos (ballState:BallState) =
         let xPos = ballState.Position.X + ballState.Velocity.X
@@ -54,6 +53,26 @@ module Update =
         else
             ballState.Velocity
 
+    let calculateReflectionAxis desiredPosition collideBlocks=
+        let getReflectionAxis block =
+            let leftDist = abs <| (desiredPosition.X + ballWidth) - block.Position.X
+            let rightDist = abs <| desiredPosition.X - (block.Position.X + blockWidth)
+            let topDist = abs <| (desiredPosition.Y + ballWidth) - block.Position.Y
+            let botDist = abs <| desiredPosition.Y - (block.Position.Y + blockHeight)
+
+            if leftDist < topDist && leftDist < botDist then
+                {X=(-1.0f); Y=(1.0f)}
+            elif rightDist < topDist && rightDist < botDist then
+                {X=(-1.0f); Y=(1.0f)}
+            else
+                {X=(1.0f); Y=(-1.0f)}
+
+        collideBlocks
+        |> List.map getReflectionAxis 
+        |> Seq.ofList 
+        |> Seq.distinct
+        |> Seq.reduce (fun v1 v2 -> {X=v1.X*v2.X; Y=v1.Y*v2.Y})
+
     let resolveBlockCollision activeBlocks ballState  =
         let desiredPosition = (calcNewBallPos ballState).Position
         let ballDims = {X=ballWidth; Y=ballWidth}
@@ -63,35 +82,15 @@ module Update =
         if collideBlocks.Length = 0 then
             (activeBlocks, ballState)
         else
-            let getReflectionAxis block =
-                let leftDist = abs <| (desiredPosition.X + ballWidth) - block.Position.X
-                let rightDist = abs <| desiredPosition.X - (block.Position.X + blockWidth)
-                let topDist = abs <| (desiredPosition.Y + ballWidth) - block.Position.Y
-                let botDist = abs <| desiredPosition.Y - (block.Position.Y + blockHeight)
-
-                if leftDist < topDist && leftDist < botDist then
-                    {X=(-1.0f); Y=(1.0f)}
-                elif rightDist < topDist && rightDist < botDist then
-                    {X=(-1.0f); Y=(1.0f)}
-                else
-                    {X=(1.0f); Y=(-1.0f)}
-
-            let reflectionAxis = 
-                collideBlocks
-                |> List.map getReflectionAxis 
-                |> Seq.ofList 
-                |> Seq.distinct
-                |> Seq.reduce (fun v1 v2 -> {X=v1.X*v2.X; Y=v1.Y*v2.Y})
+            let reflectionAxis = calculateReflectionAxis desiredPosition collideBlocks
 
             let resolvedVel = {
                 X=ballState.Velocity.X*reflectionAxis.X; 
                 Y=ballState.Velocity.Y*reflectionAxis.Y}
             
-            let newActiveBlocks =  
-                activeBlocks
-                |> List.filter (fun b -> not <| List.exists b.Equals collideBlocks)
+            let newActiveBlocks =  activeBlocks |> List.filter (fun b -> not <| List.exists b.Equals collideBlocks)
 
-            collideBlocks |> List.map (fun b -> queueSpriteDeletion b.BlockId) |> ignore
+            collideBlocks |> List.map (fun b -> Draw.QueueSpriteDeletion b.BlockId) |> ignore
             collideBlocks |> List.map (fun b -> genFallingBlockAnim ballState.Position b.Position) |> ignore
             (newActiveBlocks, {ballState with Velocity=resolvedVel; NumBounces=ballState.NumBounces+1} )
 
@@ -108,5 +107,5 @@ module Update =
 
         let speedAdjustedBallState = incrementBallSpeed collisionResolvedBallState
 
-        queueSpriteUpdate speedAdjustedBallState.BallId
+        Draw.QueueSpriteUpdate speedAdjustedBallState.BallId
         (calcNewBallPos speedAdjustedBallState, newActiveBlocks)

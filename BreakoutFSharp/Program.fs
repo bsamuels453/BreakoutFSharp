@@ -90,7 +90,7 @@ let main argv =
         let (newBallState, newActiveBlocks) = ballTick gameState.PaddleState.Position gameState.ActiveBlocks gameState.BallState
         gameState <- {gameState with BallState = newBallState; ActiveBlocks = newActiveBlocks}
 
-        renderState <- updateRenderState renderState gameState
+        renderState <- updateRenderState renderState gameState textures
         draw win renderState
 
         let idleTime = getIdleTime stopwatch

@@ -29,14 +29,14 @@ module Draw =
         texture
 
     let mutable private drawablesToUpdate:ObjectId list = []
-    let mutable private drawablesToAdd:SpriteState list = []
+    let mutable private drawablesToAdd:((string*Texture) list -> SpriteState) list = []
     let mutable private drawablesToRemove:ObjectId list = []
 
     let queueSpriteUpdate objectId =
         drawablesToUpdate <- List.Cons (objectId, drawablesToUpdate)
 
-    let queueSpriteAddition sprite=
-        drawablesToAdd <- List.Cons (sprite, drawablesToAdd)
+    let queueSpriteAddition spriteInitializer =
+        drawablesToAdd <- List.Cons (spriteInitializer, drawablesToAdd)
 
     let queueSpriteDeletion objectId =
         drawablesToRemove <- List.Cons (objectId, drawablesToRemove)
@@ -64,11 +64,12 @@ module Draw =
             blockSprites
 
 
-    let updateRenderState renderState gameState =
+    let updateRenderState renderState gameState textures =
         let mutable drawableSprites = renderState.Sprites |> Array.ofList
 
         if drawablesToAdd.Length <> 0 then
-            drawableSprites <- Array.append drawableSprites (Array.ofList drawablesToAdd)
+            let generatedSprites = drawablesToAdd |> List.map (fun f -> f textures)
+            drawableSprites <- Array.append drawableSprites (Array.ofList generatedSprites)
             drawableSprites <- Array.sortBy (fun elem -> elem.ZLayer) drawableSprites
             drawablesToAdd <- []
 
@@ -100,41 +101,45 @@ module Draw =
         ()
 
     let genDefaultPaddleSprite gameState textures =
-        let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
-        sprite.Texture <- getTexture textures "red"
-        sprite.Position <- new Vector2f(gameState.PaddleState.Position.X, gameState.PaddleState.Position.Y)
-        let updatePaddle renderState gameState (sprite:SpriteState) =
-            let paddleState = gameState.PaddleState
-            sprite.Sprite.Position <- new Vector2f(paddleState.Position.X, paddleState.Position.Y)
-            sprite
+        let createSprite textures =
+            let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
+            sprite.Texture <- getTexture textures "red"
+            sprite.Position <- new Vector2f(gameState.PaddleState.Position.X, gameState.PaddleState.Position.Y)
+            let updatePaddle renderState gameState (sprite:SpriteState) =
+                let paddleState = gameState.PaddleState
+                sprite.Sprite.Position <- new Vector2f(paddleState.Position.X, paddleState.Position.Y)
+                sprite
 
-        let spriteState = {Sprite=sprite; Id=gameState.PaddleState.PaddleId; ZLayer = 1.0; Update=updatePaddle}
-        queueSpriteAddition spriteState
+            {Sprite=sprite; Id=gameState.PaddleState.PaddleId; ZLayer = 1.0; Update=updatePaddle}
+        queueSpriteAddition createSprite
 
 
     let genDefaultBallSprite gameState textures =
-        let sprite = new CircleShape(ballWidth/2.0f)
-        sprite.Texture <- getTexture textures "blue"
-        sprite.Position <- new Vector2f(gameState.BallState.Position.X, gameState.BallState.Position.Y)
-        let updateBall renderState gameState (sprite:SpriteState) =
-            let ballState = gameState.BallState
-            sprite.Sprite.Position <- new Vector2f(ballState.Position.X, ballState.Position.Y)
-            sprite
+        let createSprite textures =
+            let sprite = new CircleShape(ballWidth/2.0f)
+            sprite.Texture <- getTexture textures "blue"
+            sprite.Position <- new Vector2f(gameState.BallState.Position.X, gameState.BallState.Position.Y)
+            let updateBall renderState gameState (sprite:SpriteState) =
+                let ballState = gameState.BallState
+                sprite.Sprite.Position <- new Vector2f(ballState.Position.X, ballState.Position.Y)
+                sprite
 
-        let spriteState = {Sprite=sprite; Id=gameState.BallState.BallId; ZLayer = 1.0; Update=updateBall}
-        queueSpriteAddition spriteState
+            {Sprite=sprite; Id=gameState.BallState.BallId; ZLayer = 1.0; Update=updateBall}
+        queueSpriteAddition createSprite
 
     let genDefaultBlockSprites gameState (textures:(string*Texture) list)=
         let updateBlock renderState gameState (sprite:SpriteState) = sprite
 
         gameState.ActiveBlocks |> List.map (fun block ->
-            let idx = List.findIndex block.Position.Y.Equals blockYCoords
-            let texture = snd textures.[idx]
-            let sprite = new RectangleShape(new Vector2f(blockWidth, blockHeight))
-            sprite.Texture <- texture
-            sprite.Position <- new Vector2f(block.Position.X, block.Position.Y)
-            let spriteState = {Sprite=sprite; Id=block.BlockId; ZLayer = 1.0; Update=updateBlock}
-            queueSpriteAddition spriteState
+            let createSprite (textures:(string*Texture) list) = 
+                let idx = List.findIndex block.Position.Y.Equals blockYCoords
+                let texture = snd textures.[idx]
+                let sprite = new RectangleShape(new Vector2f(blockWidth, blockHeight))
+                sprite.Texture <- texture
+                sprite.Position <- new Vector2f(block.Position.X, block.Position.Y)
+                {Sprite=sprite; Id=block.BlockId; ZLayer = 1.0; Update=updateBlock}
+
+            queueSpriteAddition createSprite
             )
 
     let generateDefaultScene gameState textures =

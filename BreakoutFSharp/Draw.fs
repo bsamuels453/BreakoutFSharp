@@ -42,29 +42,6 @@ module Draw =
     let queueSpriteDeletion objectId =
         drawablesToRemove <- List.Cons (objectId, drawablesToRemove)
 
-
-    let updateBallSprite (ballSprite:SpriteState) (ballState : BallState) =
-        ballSprite.Sprite.Position <- new Vector2f(ballState.Position.X, ballState.Position.Y)
-        ballSprite
-        
-    let updatePaddleSprite (paddleSprite:SpriteState) (paddleState:PaddleState) =
-        paddleSprite.Sprite.Position <- new Vector2f(paddleState.Position.X, paddleState.Position.Y)
-        paddleSprite
-
-    let updateBlockSprites (blockSprites:SpriteState list) activeBlocks =
-        let activeBlockPositions = activeBlocks |> List.map (fun a -> new Vector2f(a.Position.X, a.Position.Y))
-        if blockSprites.Length <> activeBlocks.Length then
-            let blocksToRemove = 
-                blockSprites
-                |> List.filter (fun b -> not <| List.exists b.Sprite.Position.Equals activeBlockPositions )
-            blocksToRemove |> List.map (fun b->b.Sprite.Dispose()) |> ignore
-            let blockPosToRemove = blocksToRemove |> List.map (fun b -> b.Sprite.Position)
-            let newBlockSprites = blockSprites |> List.filter (fun b-> not <| List.exists b.Sprite.Position.Equals blockPosToRemove)
-            newBlockSprites
-        else
-            blockSprites
-
-
     let updateRenderState renderState gameState textures =
         let mutable drawableSprites = renderState.Sprites |> Array.ofList
 

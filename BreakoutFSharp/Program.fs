@@ -70,7 +70,7 @@ let executeEveryHundred =
 [<STAThread>]
 let main argv =
     let win = initializeWindow()
-    let textures = LoadTextures()
+    let textures = Resource.LoadTextures()
     let mutable gameState = genDefaultGameState()
     let mutable renderState = {Sprites=[]}
     generateDefaultScene gameState
@@ -81,7 +81,7 @@ let main argv =
         stopwatch.Start()
 
         win.DispatchEvents()
-        let keyboardState = pollKeyboard()
+        let keyboardState = Control.PollKeyboard()
 
         let newPaddlePos = paddleTick gameState.PaddleState keyboardState
         let newPaddleState = {gameState.PaddleState with Position = newPaddlePos}

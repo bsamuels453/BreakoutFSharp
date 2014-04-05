@@ -1,10 +1,9 @@
 ﻿namespace global
 
-[<AutoOpen>]
 module Control =
     open SFML.Window;
     open System;
-    let getKeyState keyboardState desiredKey =
+    let GetKeyState keyboardState desiredKey =
         let matchKey key keyComp =
             match keyComp with
             | {KeyStateChange.Key = skey} when skey=key -> true
@@ -15,7 +14,7 @@ module Control =
 
 
 
-    let pollKeyboard() =
+    let PollKeyboard() =
         let arrayBuilder = new ArrayBuilder()
         let keys = Enum.GetNames(typedefof<Keyboard.Key>)
         let keyVals = Array.map (fun k -> Enum.Parse(typedefof<Keyboard.Key>, k) :?> Keyboard.Key ) keys

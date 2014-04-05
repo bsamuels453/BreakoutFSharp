@@ -12,8 +12,8 @@ module Update =
                 {X=0.0f; Y=pos.Y} 
             else pos
             
-        let aState = (getKeyState keyboardState Keyboard.Key.A).KeyState
-        let dState = (getKeyState keyboardState Keyboard.Key.D).KeyState
+        let aState = (Control.GetKeyState keyboardState Keyboard.Key.A).KeyState
+        let dState = (Control.GetKeyState keyboardState Keyboard.Key.D).KeyState
         if aState=Pressed && dState=Pressed ||aState=Released && dState=Released then
             oldPaddleState.Position
         else

@@ -9,7 +9,7 @@ module SpriteGen =
     let genDefaultPaddleSprite gameState =
         let createSprite textures =
             let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
-            sprite.Texture <- GetTexture textures "red"
+            sprite.Texture <- Resource.GetTexture textures "red"
             sprite.Position <- new Vector2f(gameState.PaddleState.Position.X, gameState.PaddleState.Position.Y)
             let updatePaddle renderState gameState (sprite:SpriteState) =
                 let paddleState = gameState.PaddleState
@@ -62,7 +62,7 @@ module SpriteGen =
     let genDefaultBallSprite gameState =
         let createSprite textures =
             let sprite = new CircleShape(ballWidth/2.0f)
-            sprite.Texture <- GetTexture textures "blue"
+            sprite.Texture <- Resource.GetTexture textures "blue"
             sprite.Position <- new Vector2f(gameState.BallState.Position.X, gameState.BallState.Position.Y)
             let updateBall renderState gameState (sprite:SpriteState) =
                 let ballState = gameState.BallState

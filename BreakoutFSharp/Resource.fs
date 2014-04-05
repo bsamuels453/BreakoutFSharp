@@ -1,6 +1,5 @@
 ﻿namespace global
 
-[<AutoOpen>]
 module Resource =
     open SFML.Graphics;
 

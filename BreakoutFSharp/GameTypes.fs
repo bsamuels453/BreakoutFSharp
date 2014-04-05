@@ -11,6 +11,8 @@ module GameTypes =
         }
 
     type ObjectId = int
+    
+    type ObjectId = ObjectId of int
 
     type BallState = {
         BallId : ObjectId

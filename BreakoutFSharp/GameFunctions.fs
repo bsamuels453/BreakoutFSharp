@@ -6,5 +6,5 @@ module GameFunctions =
         let count = ref 0;
         (fun () -> 
             count := !count + 1
-            !count
+            ObjectId(!count)
             )

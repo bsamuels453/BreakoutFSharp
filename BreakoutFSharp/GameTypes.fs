@@ -24,6 +24,7 @@ module GameTypes =
     type PaddleState = {
         PaddleId : ObjectId
         Position : Vec2
+        CollidedLastFrame : bool
         }
 
     type KeyState =

@@ -55,12 +55,11 @@ let main argv =
         win.DispatchEvents()
         let keyboardState = Control.PollKeyboard()
 
-        let newPaddlePos = Update.PaddleTick gameState.PaddleState keyboardState
-        let newPaddleState = {gameState.PaddleState with Position = newPaddlePos}
+        let newPaddleState = Update.PaddleTick gameState.PaddleState keyboardState
         gameState <- {gameState with PaddleState = newPaddleState}  
 
-        let (newBallState, newActiveBlocks) = Update.BallTick gameState.PaddleState.Position gameState.ActiveBlocks gameState.BallState
-        gameState <- {gameState with BallState = newBallState; ActiveBlocks = newActiveBlocks}
+        let (newBallState, newActiveBlocks, finalPaddleState) = Update.BallTick gameState.PaddleState gameState.ActiveBlocks gameState.BallState
+        gameState <- {gameState with BallState = newBallState; ActiveBlocks = newActiveBlocks; PaddleState = finalPaddleState}
 
         renderState <- UpdateRenderState renderState gameState textures
         Draw win renderState

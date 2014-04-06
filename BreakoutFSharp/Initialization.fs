@@ -24,7 +24,7 @@ module Initialization =
 
     let genDefaultPaddleState() : PaddleState =
         let position = {X=400.0f; Y=screenHeight - paddleXAxis};
-        {Position=position; PaddleId=GenerateSpriteId()}
+        {Position=position; PaddleId=GenerateSpriteId(); CollidedLastFrame=false}
 
     let genDefaultGameState() =
         {

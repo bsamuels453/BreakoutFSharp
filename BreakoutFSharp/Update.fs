@@ -14,12 +14,16 @@ module Update =
         let aState = (Control.GetKeyState keyboardState Keyboard.Key.A).KeyState
         let dState = (Control.GetKeyState keyboardState Keyboard.Key.D).KeyState
         if aState=Pressed && dState=Pressed ||aState=Released && dState=Released then
-            oldPaddleState.Position
+            {oldPaddleState with CollidedLastFrame=false}
         else
             Draw.QueueSpriteUpdate oldPaddleState.PaddleId
             match aState with
-            | Pressed -> restrictPaddlePos {X=oldPaddleState.Position.X - paddleSpeed; Y=oldPaddleState.Position.Y}
-            | Released -> restrictPaddlePos {X=oldPaddleState.Position.X + paddleSpeed; Y=oldPaddleState.Position.Y}               
+            | Pressed -> 
+                let pos = restrictPaddlePos {X=oldPaddleState.Position.X - paddleSpeed; Y=oldPaddleState.Position.Y}
+                {oldPaddleState with Position=pos; CollidedLastFrame=false}
+            | Released -> 
+                let pos = restrictPaddlePos {X=oldPaddleState.Position.X + paddleSpeed; Y=oldPaddleState.Position.Y}
+                {oldPaddleState with Position=pos; CollidedLastFrame=false}            
 
     let private calcNewBallPos (ballState:BallState) =
         let xPos = ballState.Position.X + ballState.Velocity.X
@@ -43,14 +47,15 @@ module Update =
     let private rectangleOverlap p1 d1 p2 d2 =
         not (p2.X > p1.X+d1.X || p2.X+d2.X < p1.X || p2.Y > p1.Y + d1.Y || p2.Y+d2.Y < p1.Y)
 
-    let private resolvePaddleCollision paddleState ballState =
+    let private resolvePaddleCollision (paddleState:PaddleState) ballState =
         let desiredPosition = (calcNewBallPos ballState).Position
         let paddleDims = {X=paddleWidth; Y=paddleHeight}
         let ballDims = {X=ballWidth; Y=ballWidth}
-        if rectangleOverlap paddleState paddleDims ballState.Position ballDims then
-            {ballState.Velocity with Y=ballState.Velocity.Y * -1.0f}
+        if rectangleOverlap paddleState.Position paddleDims ballState.Position ballDims then
+            Draw.QueueSpriteUpdate paddleState.PaddleId
+            ({paddleState with CollidedLastFrame=true}, {ballState.Velocity with Y=ballState.Velocity.Y * -1.0f})
         else
-            ballState.Velocity
+            (paddleState, ballState.Velocity)
 
     let private calculateReflectionAxis desiredPosition collideBlocks=
         let getReflectionAxis block =
@@ -100,10 +105,10 @@ module Update =
 
     let BallTick paddleState activeBlocks prevBallState =
         let boundaryResolvedVelocity = resolveBoundaryCollision prevBallState
-        let paddleResolvedVelocity = resolvePaddleCollision paddleState {prevBallState with Velocity = boundaryResolvedVelocity}
+        let (newPaddleState, paddleResolvedVelocity) = resolvePaddleCollision paddleState {prevBallState with Velocity = boundaryResolvedVelocity}
         let (newActiveBlocks ,collisionResolvedBallState) = resolveBlockCollision activeBlocks {prevBallState with Velocity = paddleResolvedVelocity}
 
         let speedAdjustedBallState = incrementBallSpeed collisionResolvedBallState
 
         Draw.QueueSpriteUpdate speedAdjustedBallState.BallId
-        (calcNewBallPos speedAdjustedBallState, newActiveBlocks)
+        (calcNewBallPos speedAdjustedBallState, newActiveBlocks, newPaddleState)

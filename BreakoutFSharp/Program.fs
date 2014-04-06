@@ -48,7 +48,9 @@ let main argv =
     let mutable soundState = Sound.genDefaultSoundState()
     SpriteGen.generateDefaultScene gameState
     let stopwatch = new Stopwatch()
-    
+    SpriteGen.genBallGhost gameState 1 0.90f 0.9f
+    SpriteGen.genBallGhost gameState 2 0.75f 0.7f
+    SpriteGen.genBallGhost gameState 3 0.55f 0.5f
 
     while win.IsOpen() do
         throttleTo60fps()

@@ -6,7 +6,7 @@ module SpriteGen =
     open System.Diagnostics;
 
     let genDefaultPaddleSprite gameState =
-        let fadeTime = 0.5
+        let fadeTime = 0.25
         let sw = new Stopwatch()
 
         let updatePaddle renderState gameState (sprite:SpriteState) =

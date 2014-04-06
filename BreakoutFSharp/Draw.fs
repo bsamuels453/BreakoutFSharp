@@ -24,6 +24,33 @@ module Draw =
             |> List.append drawableSprites
             |> List.sortBy (fun elem -> elem.ZLayer)
 
+    let private removeSprites drawableSprites idsToRemove =
+        let spritesToRemove =  drawableSprites |> List.filter (fun elem -> (List.exists (elem.Id.Equals) idsToRemove ))
+        spritesToRemove |> List.map (fun s -> s.Sprite.Dispose()) |> ignore
+         
+        drawableSprites |> List.filter (fun elem -> not (List.exists (elem.Id.Equals) idsToRemove ))
+
+    let private updateSprites tempRenderState gameState sprites idsToUpdate=
+        let rec applyUpdates sprites updates =
+            match updates with
+            | [] -> ()
+            | h::t ->
+                let idx = sprites |> Array.findIndex (fun s -> s.Id.Equals h)
+                let sprite = sprites.[idx]
+                sprites.[idx] <- sprite.Update tempRenderState gameState sprite
+                applyUpdates sprites t
+                
+        let autoUpdateSprites = 
+            sprites 
+            |> List.filter (fun sp -> sp.AutoUpdate)
+            |> List.map (fun sp -> sp.Id)
+
+        let fullIdsToUpdate = List.append idsToUpdate autoUpdateSprites
+
+        let spriteArr = Array.ofList sprites
+        applyUpdates spriteArr fullIdsToUpdate
+        spriteArr
+
     let updateRenderState renderState gameState textures =
         let drawableSprites = 
             match drawablesToAdd.Length with
@@ -31,32 +58,15 @@ module Draw =
             | _ -> addSprites renderState.Sprites drawablesToAdd textures
         drawablesToAdd <- []
 
-        let filteredSprites =  drawableSprites |> List.filter (fun elem -> not (List.exists (elem.Id.Equals) drawablesToRemove ))
+        let filteredSprites = removeSprites drawableSprites drawablesToRemove
         drawablesToRemove <- []
 
-        let newRenderState = {renderState with Sprites=filteredSprites}
+        let tempRenderState = {renderState with Sprites=filteredSprites}
 
-        let rec applyUpdates sprites updates =
-            match updates with
-            | [] -> ()
-            | h::t ->
-                let idx = sprites |> Array.findIndex (fun s -> s.Id.Equals h)
-                let sprite = sprites.[idx]
-                sprites.[idx] <- sprite.Update newRenderState gameState sprite
-                applyUpdates sprites t
-                
-        let autoUpdateSprites = 
-            filteredSprites 
-            |> List.filter (fun sp -> sp.AutoUpdate)
-            |> List.map (fun sp -> sp.Id)
-
-        drawablesToUpdate <- List.append drawablesToUpdate autoUpdateSprites
-
-        let newSprites = Array.ofList filteredSprites
-        applyUpdates newSprites drawablesToUpdate
+        let updatedSprites = updateSprites tempRenderState gameState filteredSprites drawablesToUpdate
         drawablesToUpdate <- []
 
-        {renderState with Sprites = List.ofArray newSprites}
+        {renderState with Sprites = List.ofArray updatedSprites}
 
     let draw (win:RenderWindow) renderState =
         win.Clear (new Color(43uy, 43uy, 90uy, 255uy))

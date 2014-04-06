@@ -34,7 +34,7 @@ module Draw =
         let filteredSprites =  drawableSprites |> List.filter (fun elem -> not (List.exists (elem.Id.Equals) drawablesToRemove ))
         drawablesToRemove <- []
 
-        let newRenderState = {Sprites=filteredSprites}
+        let newRenderState = {renderState with Sprites=filteredSprites}
 
         let rec applyUpdates sprites updates =
             match updates with
@@ -60,6 +60,7 @@ module Draw =
 
     let draw (win:RenderWindow) renderState =
         win.Clear (new Color(43uy, 43uy, 90uy, 255uy))
+        win.SetView renderState.View
 
         renderState.Sprites |> List.map (fun s -> s.Sprite.Draw(win,RenderStates.Default)) |> ignore
 

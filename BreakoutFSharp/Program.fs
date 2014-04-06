@@ -44,7 +44,7 @@ let main argv =
     let win = initializeWindow()
     let textures = Resource.loadTextures()
     let mutable gameState = genDefaultGameState()
-    let mutable renderState = {Sprites=[]}
+    let mutable renderState = {Sprites=[]; View=win.GetView()}
     SpriteGen.generateDefaultScene gameState
     let stopwatch = new Stopwatch()
 

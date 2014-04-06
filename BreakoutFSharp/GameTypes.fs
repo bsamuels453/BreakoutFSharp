@@ -49,6 +49,7 @@ module GameTypes =
 
     type RenderState = {
         Sprites : SpriteState list
+        View : View
     } 
 
     and SpriteState = {

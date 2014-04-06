@@ -3,7 +3,7 @@
 module Resource =
     open SFML.Graphics;
 
-    let LoadTextures() =
+    let loadTextures() =
         let listbuilder = new ListBuilder()
         listbuilder{
             yield "red", new Texture("redsplotch.jpg")
@@ -15,7 +15,7 @@ module Resource =
             yield "purple", new Texture("purplesplotch.jpg")
         }
 
-    let GetTexture textures desiredTexture =
+    let getTexture textures desiredTexture =
         let matchText text comp =
             match comp with
             | (t,_) when t = text -> true

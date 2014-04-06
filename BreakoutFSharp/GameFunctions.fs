@@ -2,7 +2,7 @@
 
 [<AutoOpen>]
 module GameFunctions =
-    let GenerateSpriteId = 
+    let generateSpriteId = 
         let count = ref 0;
         (fun () -> 
             count := !count + 1

@@ -3,7 +3,7 @@
 module Update =
     open SFML.Window;
 
-    let PaddleTick (oldPaddleState:PaddleState) keyboardState=
+    let paddleTick (oldPaddleState:PaddleState) keyboardState=
         let restrictPaddlePos pos =
             if pos.X > (screenWidth - paddleWidth) then
                 {X=screenWidth-paddleWidth; Y=pos.Y} 
@@ -11,12 +11,12 @@ module Update =
                 {X=0.0f; Y=pos.Y} 
             else pos
             
-        let aState = (Control.GetKeyState keyboardState Keyboard.Key.A).KeyState
-        let dState = (Control.GetKeyState keyboardState Keyboard.Key.D).KeyState
+        let aState = (Control.getKeyState keyboardState Keyboard.Key.A).KeyState
+        let dState = (Control.getKeyState keyboardState Keyboard.Key.D).KeyState
         if aState=Pressed && dState=Pressed ||aState=Released && dState=Released then
             {oldPaddleState with CollidedLastFrame=false}
         else
-            Draw.QueueSpriteUpdate oldPaddleState.PaddleId
+            Draw.queueSpriteUpdate oldPaddleState.PaddleId
             match aState with
             | Pressed -> 
                 let pos = restrictPaddlePos {X=oldPaddleState.Position.X - paddleSpeed; Y=oldPaddleState.Position.Y}
@@ -52,7 +52,7 @@ module Update =
         let paddleDims = {X=paddleWidth; Y=paddleHeight}
         let ballDims = {X=ballWidth; Y=ballWidth}
         if rectangleOverlap paddleState.Position paddleDims ballState.Position ballDims then
-            Draw.QueueSpriteUpdate paddleState.PaddleId
+            Draw.queueSpriteUpdate paddleState.PaddleId
             ({paddleState with CollidedLastFrame=true}, {ballState.Velocity with Y=ballState.Velocity.Y * -1.0f})
         else
             (paddleState, ballState.Velocity)
@@ -93,8 +93,8 @@ module Update =
             
             let newActiveBlocks =  activeBlocks |> List.filter (fun b -> not <| List.exists b.Equals collideBlocks)
 
-            collideBlocks |> List.map (fun b -> Draw.QueueSpriteDeletion b.BlockId) |> ignore
-            collideBlocks |> List.map (fun b -> SpriteGen.GenFallingBlockAnim ballState.Position b.Position) |> ignore
+            collideBlocks |> List.map (fun b -> Draw.queueSpriteDeletion b.BlockId) |> ignore
+            collideBlocks |> List.map (fun b -> SpriteGen.genFallingBlockAnim ballState.Position b.Position) |> ignore
             (newActiveBlocks, {ballState with Velocity=resolvedVel; NumBounces=ballState.NumBounces+1} )
 
     let private incrementBallSpeed ballState =
@@ -103,12 +103,12 @@ module Update =
         else
             ballState
 
-    let BallTick paddleState activeBlocks prevBallState =
+    let ballTick paddleState activeBlocks prevBallState =
         let boundaryResolvedVelocity = resolveBoundaryCollision prevBallState
         let (newPaddleState, paddleResolvedVelocity) = resolvePaddleCollision paddleState {prevBallState with Velocity = boundaryResolvedVelocity}
         let (newActiveBlocks ,collisionResolvedBallState) = resolveBlockCollision activeBlocks {prevBallState with Velocity = paddleResolvedVelocity}
 
         let speedAdjustedBallState = incrementBallSpeed collisionResolvedBallState
 
-        Draw.QueueSpriteUpdate speedAdjustedBallState.BallId
+        Draw.queueSpriteUpdate speedAdjustedBallState.BallId
         (calcNewBallPos speedAdjustedBallState, newActiveBlocks, newPaddleState)

@@ -11,20 +11,20 @@ module Initialization =
         win.SetKeyRepeatEnabled false
         win
 
-    let genStartBlocks () =
+    let private genStartBlocks () =
         [for x in blockXCoords do
             for y in blockYCoords ->
-                {Position={X=x; Y=y}; BlockId=GenerateSpriteId()}
+                {Position={X=x; Y=y}; BlockId=generateSpriteId()}
         ]
 
-    let genDefaultBallState() =
+    let private genDefaultBallState() =
         let position = {X=300.0f; Y=300.0f}
         let velocity = {X=initlBallSpeed; Y=initlBallSpeed}
-        {Position=position; Velocity=velocity; BallId=GenerateSpriteId(); NumBounces=1}
+        {Position=position; Velocity=velocity; BallId=generateSpriteId(); NumBounces=1}
 
-    let genDefaultPaddleState() : PaddleState =
+    let private genDefaultPaddleState() : PaddleState =
         let position = {X=400.0f; Y=screenHeight - paddleXAxis};
-        {Position=position; PaddleId=GenerateSpriteId(); CollidedLastFrame=false}
+        {Position=position; PaddleId=generateSpriteId(); CollidedLastFrame=false}
 
     let genDefaultGameState() =
         {

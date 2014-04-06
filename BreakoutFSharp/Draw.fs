@@ -9,13 +9,13 @@ module Draw =
     let mutable private drawablesToAdd:((string*Texture) list -> SpriteState) list = []
     let mutable private drawablesToRemove:ObjectId list = []
 
-    let QueueSpriteUpdate objectId =
+    let queueSpriteUpdate objectId =
         drawablesToUpdate <- List.Cons (objectId, drawablesToUpdate)
 
-    let QueueSpriteAddition spriteInitializer =
+    let queueSpriteAddition spriteInitializer =
         drawablesToAdd <- List.Cons (spriteInitializer, drawablesToAdd)
 
-    let QueueSpriteDeletion objectId =
+    let queueSpriteDeletion objectId =
         drawablesToRemove <- List.Cons (objectId, drawablesToRemove)
 
     let private addSprites drawableSprites spritesToAdd textures =
@@ -24,7 +24,7 @@ module Draw =
             |> List.append drawableSprites
             |> List.sortBy (fun elem -> elem.ZLayer)
 
-    let UpdateRenderState renderState gameState textures =
+    let updateRenderState renderState gameState textures =
         let drawableSprites = 
             match drawablesToAdd.Length with
             | 0 -> renderState.Sprites
@@ -58,7 +58,7 @@ module Draw =
 
         {renderState with Sprites = List.ofArray newSprites}
 
-    let Draw (win:RenderWindow) renderState =
+    let draw (win:RenderWindow) renderState =
         win.Clear (new Color(43uy, 43uy, 90uy, 255uy))
 
         renderState.Sprites |> List.map (fun s -> s.Sprite.Draw(win,RenderStates.Default)) |> ignore

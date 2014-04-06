@@ -5,7 +5,7 @@ module SpriteGen =
     open SFML.Window;
     open System.Diagnostics;
 
-    let GenDefaultPaddleSprite gameState =
+    let genDefaultPaddleSprite gameState =
         let fadeTime = 0.5
         let sw = new Stopwatch()
 
@@ -35,14 +35,14 @@ module SpriteGen =
 
         let createSprite textures =
             let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
-            sprite.Texture <- Resource.GetTexture textures "cyan"
+            sprite.Texture <- Resource.getTexture textures "cyan"
             sprite.Position <- new Vector2f(gameState.PaddleState.Position.X, gameState.PaddleState.Position.Y)
             sprite.FillColor <- new Color(128uy, 128uy, 128uy, 255uy)
             {Sprite=sprite; Id=gameState.PaddleState.PaddleId; ZLayer = 1.0; Update=updatePaddle; AutoUpdate=false}
 
-        Draw.QueueSpriteAddition createSprite
+        Draw.queueSpriteAddition createSprite
 
-    let GenFallingBlockAnim ballPos blockPos =
+    let genFallingBlockAnim ballPos blockPos =
         let sw = new Stopwatch()
         let displayTime = 1.0
         let origPos = blockPos
@@ -56,7 +56,7 @@ module SpriteGen =
             let elapsed = sw.Elapsed.TotalSeconds
                 
             if elapsed > displayTime then
-                Draw.QueueSpriteDeletion s.Id
+                Draw.queueSpriteDeletion s.Id
             else sw.Start()
 
             let deltaY = initlVelocityY * elapsed + 0.5 * accelerationY * elapsed * elapsed
@@ -77,11 +77,11 @@ module SpriteGen =
             sprite.Position <- blockPos.ToVec2f()
             sw.Start()
 
-            {Sprite=sprite; Id=GenerateSpriteId(); ZLayer= 1.0; Update=updateAnim; AutoUpdate=true}
-        Draw.QueueSpriteAddition createSprite
+            {Sprite=sprite; Id=generateSpriteId(); ZLayer= 1.0; Update=updateAnim; AutoUpdate=true}
+        Draw.queueSpriteAddition createSprite
         ()
 
-    let GenDefaultBallSprite gameState =
+    let genDefaultBallSprite gameState =
         let updateBall renderState gameState (sprite:SpriteState) =
             let ballState = gameState.BallState
             sprite.Sprite.Position <- ballState.Position.ToVec2f()
@@ -89,13 +89,13 @@ module SpriteGen =
 
         let createSprite textures =
             let sprite = new CircleShape(ballWidth/2.0f)
-            sprite.Texture <- Resource.GetTexture textures "blue"
+            sprite.Texture <- Resource.getTexture textures "blue"
             sprite.Position <- gameState.BallState.Position.ToVec2f()
 
             {Sprite=sprite; Id=gameState.BallState.BallId; ZLayer = 1.0; Update=updateBall; AutoUpdate=false}
-        Draw.QueueSpriteAddition createSprite
+        Draw.queueSpriteAddition createSprite
 
-    let GenDefaultBlockSprites gameState =
+    let genDefaultBlockSprites gameState =
         let updateBlock renderState gameState (sprite:SpriteState) = sprite
 
         gameState.ActiveBlocks |> List.map (fun block ->
@@ -107,10 +107,10 @@ module SpriteGen =
                 sprite.Position <- block.Position.ToVec2f()
                 {Sprite=sprite; Id=block.BlockId; ZLayer = 0.0; Update=updateBlock; AutoUpdate=false}
 
-            Draw.QueueSpriteAddition createSprite
+            Draw.queueSpriteAddition createSprite
             )
 
-    let GenerateDefaultScene gameState =
-            GenDefaultPaddleSprite gameState |> ignore
-            GenDefaultBallSprite gameState |> ignore
-            GenDefaultBlockSprites gameState |> ignore
+    let generateDefaultScene gameState =
+            genDefaultPaddleSprite gameState |> ignore
+            genDefaultBallSprite gameState |> ignore
+            genDefaultBlockSprites gameState |> ignore

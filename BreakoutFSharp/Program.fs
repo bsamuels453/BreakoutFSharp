@@ -42,10 +42,10 @@ let executeEveryHundred =
 [<STAThread>]
 let main argv =
     let win = initializeWindow()
-    let textures = Resource.LoadTextures()
+    let textures = Resource.loadTextures()
     let mutable gameState = genDefaultGameState()
     let mutable renderState = {Sprites=[]}
-    SpriteGen.GenerateDefaultScene gameState
+    SpriteGen.generateDefaultScene gameState
     let stopwatch = new Stopwatch()
 
     while win.IsOpen() do
@@ -53,16 +53,16 @@ let main argv =
         stopwatch.Start()
 
         win.DispatchEvents()
-        let keyboardState = Control.PollKeyboard()
+        let keyboardState = Control.pollKeyboard()
 
-        let newPaddleState = Update.PaddleTick gameState.PaddleState keyboardState
+        let newPaddleState = Update.paddleTick gameState.PaddleState keyboardState
         gameState <- {gameState with PaddleState = newPaddleState}  
 
-        let (newBallState, newActiveBlocks, finalPaddleState) = Update.BallTick gameState.PaddleState gameState.ActiveBlocks gameState.BallState
+        let (newBallState, newActiveBlocks, finalPaddleState) = Update.ballTick gameState.PaddleState gameState.ActiveBlocks gameState.BallState
         gameState <- {gameState with BallState = newBallState; ActiveBlocks = newActiveBlocks; PaddleState = finalPaddleState}
 
-        renderState <- UpdateRenderState renderState gameState textures
-        Draw win renderState
+        renderState <- updateRenderState renderState gameState textures
+        draw win renderState
 
         let idleTime = getIdleTime stopwatch
         executeEveryHundred (fun () -> System.Console.WriteLine("Idle during " + string (100.0 - idleTime * 100.0) + "% of 16.6ms timeslice"))

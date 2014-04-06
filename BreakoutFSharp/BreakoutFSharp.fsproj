@@ -65,6 +65,7 @@
     <Compile Include="Resource.fs" />
     <Compile Include="Draw.fs" />
     <Compile Include="SpriteGen.fs" />
+    <Compile Include="Sound.fs" />
     <Compile Include="Update.fs" />
     <Compile Include="Initialization.fs" />
     <Compile Include="Program.fs" />

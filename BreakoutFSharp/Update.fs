@@ -104,8 +104,8 @@ module Update =
             (newActiveBlocks, {ballState with Velocity=resolvedVel; NumBounces=ballState.NumBounces+1} )
 
     let private incrementBallSpeed ballState =
-        if ballState.NumBounces % 5 = 0 then
-            {ballState with Velocity = {X=ballState.Velocity.X+0.3f; Y=ballState.Velocity.Y+0.3f}; NumBounces = ballState.NumBounces+1}
+        if ballState.NumBounces % speedIncreaseIncrement = 0 then
+            {ballState with Velocity = {X=ballState.Velocity.X+ballSpeedMultiplier; Y=ballState.Velocity.Y+ballSpeedMultiplier}; NumBounces = ballState.NumBounces+1}
         else
             ballState
 

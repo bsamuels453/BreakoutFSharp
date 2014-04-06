@@ -42,7 +42,10 @@ module Update =
             | n when n >= (screenHeight-ballWidth) -> -ballState.Velocity.Y
             | n when n <=  0.0f -> -ballState.Velocity.Y
             | _ -> ballState.Velocity.Y
-        {X=newVelX;Y=newVelY}
+        let newVel = {X=newVelX;Y=newVelY}
+        if newVel<>ballState.Velocity then
+            Sound.queueSoundStart "squareblip"
+        newVel
 
     let private rectangleOverlap p1 d1 p2 d2 =
         not (p2.X > p1.X+d1.X || p2.X+d2.X < p1.X || p2.Y > p1.Y + d1.Y || p2.Y+d2.Y < p1.Y)
@@ -53,6 +56,8 @@ module Update =
         let ballDims = {X=ballWidth; Y=ballWidth}
         if rectangleOverlap paddleState.Position paddleDims ballState.Position ballDims then
             Draw.queueSpriteUpdate paddleState.PaddleId
+            Sound.queueSoundStart "blip"
+
             ({paddleState with CollidedLastFrame=true}, {ballState.Velocity with Y=ballState.Velocity.Y * -1.0f})
         else
             (paddleState, ballState.Velocity)
@@ -95,6 +100,7 @@ module Update =
 
             collideBlocks |> List.map (fun b -> Draw.queueSpriteDeletion b.BlockId) |> ignore
             collideBlocks |> List.map (fun b -> SpriteGen.genFallingBlockAnim ballState.Position b.Position) |> ignore
+            Sound.queueSoundStart "hit"
             (newActiveBlocks, {ballState with Velocity=resolvedVel; NumBounces=ballState.NumBounces+1} )
 
     let private incrementBallSpeed ballState =

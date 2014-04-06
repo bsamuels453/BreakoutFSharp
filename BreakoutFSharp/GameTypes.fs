@@ -4,6 +4,7 @@
 module GameTypes =
     open SFML.Window
     open SFML.Graphics
+    open SFML.Audio;
 
     type Vec2 = {X : float32; Y : float32}
         with 
@@ -50,8 +51,7 @@ module GameTypes =
     type RenderState = {
         Sprites : SpriteState list
         View : View
-    } 
-
+    }
     and SpriteState = {
         Id : ObjectId
         ZLayer : float
@@ -60,6 +60,10 @@ module GameTypes =
         Update : (RenderState -> GameState -> SpriteState -> SpriteState)
     }
 
+    type SoundState = {
+        ActiveSounds : Sound list
+        SoundBuffers : (string*SoundBuffer) list
+    }
 
     type ListBuilder() =
         member this.Bind(m, f) = 

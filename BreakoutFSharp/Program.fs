@@ -44,9 +44,11 @@ let main argv =
     let win = initializeWindow()
     let textures = Resource.loadTextures()
     let mutable gameState = genDefaultGameState()
-    let mutable renderState = {Sprites=[]; View=win.GetView()}
+    let mutable renderState = Draw.genDefaultRenderState win
+    let mutable soundState = Sound.genDefaultSoundState()
     SpriteGen.generateDefaultScene gameState
     let stopwatch = new Stopwatch()
+    
 
     while win.IsOpen() do
         throttleTo60fps()
@@ -63,6 +65,8 @@ let main argv =
 
         renderState <- updateRenderState renderState gameState textures
         draw win renderState
+
+        soundState <- Sound.updateSoundState gameState soundState
 
         let idleTime = getIdleTime stopwatch
         executeEveryHundred (fun () -> System.Console.WriteLine("Idle during " + string (100.0 - idleTime * 100.0) + "% of 16.6ms timeslice"))

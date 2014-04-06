@@ -2,6 +2,7 @@
 
 module Resource =
     open SFML.Graphics;
+    open SFML.Audio;
 
     let loadTextures() =
         let listbuilder = new ListBuilder()
@@ -15,12 +16,20 @@ module Resource =
             yield "purple", new Texture("purplesplotch.jpg")
         }
 
-    let getTexture textures desiredTexture =
+    let loadSounds() =
+        let listbuilder = new ListBuilder()
+        listbuilder{
+            yield "hit", new SoundBuffer("hit.wav")
+            yield "blip", new SoundBuffer("blip.wav")
+            yield "squareblip", new SoundBuffer("squareblip.wav")
+        }
+
+    let extractResource resourceList desiredResourceName =
         let matchText text comp =
             match comp with
             | (t,_) when t = text -> true
             | _ -> false
         let (_,texture) =
-            textures
-            |> List.find (matchText desiredTexture)
+            resourceList
+            |> List.find (matchText desiredResourceName)
         texture

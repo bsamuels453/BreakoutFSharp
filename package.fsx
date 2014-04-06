@@ -17,7 +17,7 @@ try
     let releaseFiles = Directory.GetFiles("Release")
     let filesToCpy = 
         releaseFiles 
-        |> Array.filter (fun (s:String) -> s.Contains ".dll" || s.Contains ".exe" || s.Contains ".jpg")
+        |> Array.filter (fun (s:String) -> s.Contains ".dll" || s.Contains ".exe" || s.Contains ".jpg" || s.Contains ".wav")
         |> Array.map (fun (s:string)-> s.Substring 8)
         
     filesToCpy |> Array.map (fun file -> File.Copy("Release/" + file, "Packaged/BreakoutFSharp/" + file)) |> ignore

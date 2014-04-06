@@ -50,6 +50,7 @@ module SpriteGen =
         let initlVelocityX = float ((blockCenter.X-ballPos.X) * 5.0f)
         let initlVelocityY = float ((blockCenter.Y-ballPos.Y) * 10.0f)
         let accelerationY = 800.0
+        let fadedColor = 170uy
 
         let updateAnim renderState gameState (s:SpriteState) =
             sw.Stop()
@@ -65,7 +66,7 @@ module SpriteGen =
             let mutable transparency = 1.0 - elapsed/displayTime
             if transparency > 1.0 then transparency <- 1.0
             if transparency < 0.0 then transparency <- 0.0
-            let color = new Color(255uy, 255uy, 255uy, byte <| 255.0 * transparency)
+            let color = new Color(fadedColor, fadedColor, fadedColor, byte <| 255.0 * transparency)
             s.Sprite.FillColor <- color
             s
 
@@ -75,6 +76,7 @@ module SpriteGen =
             let sprite = new RectangleShape(new Vector2f(blockWidth, blockHeight));
             sprite.Texture <- texture
             sprite.Position <- blockPos.ToVec2f()
+            sprite.FillColor <- new Color(fadedColor, fadedColor, fadedColor, 255uy)
             sw.Start()
 
             {Sprite=sprite; Id=generateSpriteId(); ZLayer= 1.0; Update=updateAnim; AutoUpdate=true}

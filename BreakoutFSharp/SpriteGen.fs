@@ -35,7 +35,7 @@ module SpriteGen =
 
         let createSprite textures =
             let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
-            sprite.Texture <- Resource.getTexture textures "cyan"
+            sprite.Texture <- Resource.extractResource textures "cyan"
             sprite.Position <- new Vector2f(gameState.PaddleState.Position.X, gameState.PaddleState.Position.Y)
             sprite.FillColor <- new Color(128uy, 128uy, 128uy, 255uy)
             {Sprite=sprite; Id=gameState.PaddleState.PaddleId; ZLayer = 1.0; Update=updatePaddle; AutoUpdate=false}
@@ -91,7 +91,7 @@ module SpriteGen =
 
         let createSprite textures =
             let sprite = new CircleShape(ballWidth/2.0f)
-            sprite.Texture <- Resource.getTexture textures "blue"
+            sprite.Texture <- Resource.extractResource textures "blue"
             sprite.Position <- gameState.BallState.Position.ToVec2f()
 
             {Sprite=sprite; Id=gameState.BallState.BallId; ZLayer = 1.0; Update=updateBall; AutoUpdate=false}

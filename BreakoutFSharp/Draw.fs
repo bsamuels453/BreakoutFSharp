@@ -76,3 +76,6 @@ module Draw =
 
         win.Display()
         ()
+
+    let genDefaultRenderState (window:RenderWindow) =
+        {Sprites=[]; View=window.GetView()}

@@ -4,6 +4,7 @@ Small breakout clone to help learn F#
 
 If you actually want to compile this, you need to grab the dependency binaries and assets from the github release.
 
+![](http://i.imgur.com/PLZnhRx.png)
 
 https://github.com/bsamuels453/BreakoutFSharp
 

@@ -10,10 +10,33 @@ module SpriteGen =
             let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
             sprite.Texture <- Resource.GetTexture textures "cyan"
             sprite.Position <- new Vector2f(gameState.PaddleState.Position.X, gameState.PaddleState.Position.Y)
+            sprite.FillColor <- new Color(128uy, 128uy, 128uy, 255uy)
+            let fadeTime = 0.5
+            let sw = new Stopwatch()
+
             let updatePaddle renderState gameState (sprite:SpriteState) =
                 let paddleState = gameState.PaddleState
                 sprite.Sprite.Position <- new Vector2f(paddleState.Position.X, paddleState.Position.Y)
-                sprite
+
+                if sw.IsRunning then
+                    sw.Stop()
+                    let elapsed = sw.Elapsed.TotalSeconds
+                    sw.Start()
+                    if elapsed > fadeTime then
+                        sw.Reset()
+                        sprite.Sprite.FillColor <- new Color(128uy, 128uy, 128uy, 255uy)
+                        {sprite with AutoUpdate=false}
+                    else
+                        let delta = byte(elapsed/fadeTime*128.0)
+                        sprite.Sprite.FillColor <- new Color(255uy - delta, 255uy - delta, 255uy - delta, 255uy)
+                        sprite
+
+                elif paddleState.CollidedLastFrame then
+                    sw.Restart()
+                    sprite.Sprite.FillColor <- new Color(255uy, 255uy, 255uy, 255uy)
+                    {sprite with AutoUpdate=true}
+                else
+                    sprite
 
             {Sprite=sprite; Id=gameState.PaddleState.PaddleId; ZLayer = 1.0; Update=updatePaddle; AutoUpdate=false}
         Draw.QueueSpriteAddition createSprite

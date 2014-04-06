@@ -5,13 +5,42 @@ module SpriteGen =
     open SFML.Window;
     open System.Diagnostics;
 
+    let genBallGhost gameState delayFrameCount sizeMult transp=
+        let ghostWidth = float32 ballWidth * sizeMult
+        let prevBallCoords = ref [ for i in 1 .. delayFrameCount -> {X= -100.0f; Y= -100.0f} ]
+
+        let calcNormalizedPos pos =
+            let center = pos + {X=ballWidth/2.0f; Y=ballWidth/2.0f}
+            center - {X=ghostWidth/2.0f; Y=ghostWidth/2.0f}
+
+        let updateGhost renderState gameState (spriteState:SpriteState) =
+            let newPos = (!prevBallCoords).Head
+            
+            let normalizedPos = calcNormalizedPos gameState.BallState.Position
+            prevBallCoords :=  (!prevBallCoords).Tail @ [normalizedPos]
+
+            spriteState.Sprite.Position <- newPos.ToVec2f()
+
+            spriteState
+
+        let createSprite textures =
+            let sprite = new CircleShape(ghostWidth/2.0f)
+            sprite.Texture <- Resource.extractResource textures "blue"
+            sprite.FillColor <- new Color(255uy, 255uy, 255uy, byte (transp*100.0f))
+            sprite.Position <- new Vector2f(-100.0f, -100.0f)
+
+            {Sprite=sprite; Id=GameFunctions.generateSpriteId() ; ZLayer = 1.0; Update=updateGhost; AutoUpdate=true}
+
+        Draw.queueSpriteAddition createSprite
+
+
     let genDefaultPaddleSprite gameState =
         let fadeTime = 0.25
         let sw = new Stopwatch()
 
         let updatePaddle renderState gameState (sprite:SpriteState) =
             let paddleState = gameState.PaddleState
-            sprite.Sprite.Position <- new Vector2f(paddleState.Position.X, paddleState.Position.Y)
+            sprite.Sprite.Position <- paddleState.Position.ToVec2f()
 
             if sw.IsRunning then
                 sw.Stop()
@@ -36,7 +65,7 @@ module SpriteGen =
         let createSprite textures =
             let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
             sprite.Texture <- Resource.extractResource textures "cyan"
-            sprite.Position <- new Vector2f(gameState.PaddleState.Position.X, gameState.PaddleState.Position.Y)
+            sprite.Position <- gameState.PaddleState.Position.ToVec2f()
             sprite.FillColor <- new Color(128uy, 128uy, 128uy, 255uy)
             {Sprite=sprite; Id=gameState.PaddleState.PaddleId; ZLayer = 1.0; Update=updatePaddle; AutoUpdate=false}
 

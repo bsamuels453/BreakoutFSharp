@@ -59,7 +59,7 @@ module Draw =
         {renderState with Sprites = List.ofArray newSprites}
 
     let Draw (win:RenderWindow) renderState =
-        win.Clear Color.Black
+        win.Clear (new Color(43uy, 43uy, 90uy, 255uy))
 
         renderState.Sprites |> List.map (fun s -> s.Sprite.Draw(win,RenderStates.Default)) |> ignore
 

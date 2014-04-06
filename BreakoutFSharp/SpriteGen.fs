@@ -8,7 +8,7 @@ module SpriteGen =
     let GenDefaultPaddleSprite gameState =
         let createSprite textures =
             let sprite = new RectangleShape(new Vector2f(paddleWidth, paddleHeight));
-            sprite.Texture <- Resource.GetTexture textures "red"
+            sprite.Texture <- Resource.GetTexture textures "cyan"
             sprite.Position <- new Vector2f(gameState.PaddleState.Position.X, gameState.PaddleState.Position.Y)
             let updatePaddle renderState gameState (sprite:SpriteState) =
                 let paddleState = gameState.PaddleState

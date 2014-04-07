@@ -81,11 +81,14 @@ module Update =
         if rectangleOverlap paddleState.Position paddleDims ballState.Position ballDims then
             Draw.queueSpriteUpdate paddleState.PaddleId
             Sound.queueSoundStart "blip"
+            let reflect = 
+                match desiredPosition.Y + ballWidth/2.0f > paddleState.Position.Y + paddleHeight/2.0f with
+                | true -> 1.0f
+                | false -> -1.0f
 
-            let reflectionAxis = calculateReflectionAxis desiredPosition [paddleState.Position] paddleWidth paddleHeight
             let resolvedVel = {
-                X=ballState.Velocity.X*reflectionAxis.X; 
-                Y=ballState.Velocity.Y*reflectionAxis.Y
+                X=ballState.Velocity.X; 
+                Y=abs(ballState.Velocity.Y) * reflect
                 }
 
             ({paddleState with CollidedLastFrame=true}, resolvedVel)

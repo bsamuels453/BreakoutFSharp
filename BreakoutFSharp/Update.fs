@@ -25,10 +25,12 @@ module Update =
                 let pos = restrictPaddlePos {X=oldPaddleState.Position.X + paddleSpeed; Y=oldPaddleState.Position.Y}
                 {oldPaddleState with Position=pos; CollidedLastFrame=false}            
 
+
     let private calcNewBallPos (ballState:BallState) =
         let xPos = ballState.Position.X + ballState.Velocity.X
         let yPos = ballState.Position.Y + ballState.Velocity.Y
         {ballState with Position={X=xPos;Y=yPos}}
+
 
     let private resolveBoundaryCollision ballState =
         let desiredPosition = (calcNewBallPos ballState).Position
@@ -47,8 +49,30 @@ module Update =
             Sound.queueSoundStart "squareblip"
         newVel
 
+
     let private rectangleOverlap p1 d1 p2 d2 =
         not (p2.X > p1.X+d1.X || p2.X+d2.X < p1.X || p2.Y > p1.Y + d1.Y || p2.Y+d2.Y < p1.Y)
+
+
+    let private calculateReflectionAxis desiredPosition collidedObjectOrigins blockWidth blockHeight=
+        let getReflectionAxis block =
+            let leftDist = abs <| (desiredPosition.X + ballWidth) - block.X
+            let rightDist = abs <| desiredPosition.X - (block.X + blockWidth)
+            let topDist = abs <| (desiredPosition.Y + ballWidth) - block.Y
+            let botDist = abs <| desiredPosition.Y - (block.Y + blockHeight)
+
+            if leftDist < topDist && leftDist < botDist then
+                {X=(-1.0f); Y=(1.0f)}
+            elif rightDist < topDist && rightDist < botDist then
+                {X=(-1.0f); Y=(1.0f)}
+            else
+                {X=(1.0f); Y=(-1.0f)}
+        collidedObjectOrigins
+        |> List.map getReflectionAxis 
+        |> Seq.ofList 
+        |> Seq.distinct
+        |> Seq.reduce (fun v1 v2 -> {X=v1.X*v2.X; Y=v1.Y*v2.Y})
+
 
     let private resolvePaddleCollision (paddleState:PaddleState) ballState =
         let desiredPosition = (calcNewBallPos ballState).Position
@@ -58,29 +82,16 @@ module Update =
             Draw.queueSpriteUpdate paddleState.PaddleId
             Sound.queueSoundStart "blip"
 
-            ({paddleState with CollidedLastFrame=true}, {ballState.Velocity with Y=ballState.Velocity.Y * -1.0f})
+            let reflectionAxis = calculateReflectionAxis desiredPosition [paddleState.Position] paddleWidth paddleHeight
+            let resolvedVel = {
+                X=ballState.Velocity.X*reflectionAxis.X; 
+                Y=ballState.Velocity.Y*reflectionAxis.Y
+                }
+
+            ({paddleState with CollidedLastFrame=true}, resolvedVel)
         else
             (paddleState, ballState.Velocity)
 
-    let private calculateReflectionAxis desiredPosition collideBlocks=
-        let getReflectionAxis block =
-            let leftDist = abs <| (desiredPosition.X + ballWidth) - block.Position.X
-            let rightDist = abs <| desiredPosition.X - (block.Position.X + blockWidth)
-            let topDist = abs <| (desiredPosition.Y + ballWidth) - block.Position.Y
-            let botDist = abs <| desiredPosition.Y - (block.Position.Y + blockHeight)
-
-            if leftDist < topDist && leftDist < botDist then
-                {X=(-1.0f); Y=(1.0f)}
-            elif rightDist < topDist && rightDist < botDist then
-                {X=(-1.0f); Y=(1.0f)}
-            else
-                {X=(1.0f); Y=(-1.0f)}
-
-        collideBlocks
-        |> List.map getReflectionAxis 
-        |> Seq.ofList 
-        |> Seq.distinct
-        |> Seq.reduce (fun v1 v2 -> {X=v1.X*v2.X; Y=v1.Y*v2.Y})
 
     let private resolveBlockCollision activeBlocks ballState  =
         let desiredPosition = (calcNewBallPos ballState).Position
@@ -90,7 +101,8 @@ module Update =
         if collideBlocks.Length = 0 then
             (activeBlocks, ballState)
         else
-            let reflectionAxis = calculateReflectionAxis desiredPosition collideBlocks
+            let collideBlockOrigins = collideBlocks |> List.map (fun b -> b.Position)
+            let reflectionAxis = calculateReflectionAxis desiredPosition collideBlockOrigins blockWidth blockHeight
 
             let resolvedVel = {
                 X=ballState.Velocity.X*reflectionAxis.X; 
@@ -103,11 +115,13 @@ module Update =
             Sound.queueSoundStart "hit"
             (newActiveBlocks, {ballState with Velocity=resolvedVel; NumBounces=ballState.NumBounces+1} )
 
+
     let private incrementBallSpeed ballState =
         if ballState.NumBounces % speedIncreaseIncrement = 0 then
             {ballState with Velocity = {X=ballState.Velocity.X+ballSpeedMultiplier; Y=ballState.Velocity.Y+ballSpeedMultiplier}; NumBounces = ballState.NumBounces+1}
         else
             ballState
+
 
     let ballTick paddleState activeBlocks prevBallState =
         let boundaryResolvedVelocity = resolveBoundaryCollision prevBallState

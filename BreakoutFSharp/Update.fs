@@ -82,7 +82,7 @@ module Update =
             Draw.queueSpriteUpdate paddleState.PaddleId
             Sound.queueSoundStart "blip"
             let reflect = 
-                match desiredPosition.Y + ballWidth/2.0f > paddleState.Position.Y + paddleHeight/2.0f with
+                match ballState.Position.Y + ballWidth/2.0f > paddleState.Position.Y + paddleHeight/2.0f with
                 | true -> 1.0f
                 | false -> -1.0f
 
